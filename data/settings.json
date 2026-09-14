@@ -1,0 +1,19 @@
+{
+  "storeName": "Baires Beef",
+  "tagline": "Frigorífico",
+  "logoUrl": "",
+  "whatsappMinorista": "5491100000000",
+  "whatsappMayorista": "5491100000000",
+  "mayoristaIntro": "Abastecemos parrillas, restaurantes, carnicerías y comercios de Buenos Aires con carne de primera calidad, cortes a medida y precios especiales por volumen.",
+  "mayoristaBullets": [
+    "Precios diferenciales por volumen",
+    "Cortes a medida para tu negocio",
+    "Entregas programadas y logística propia",
+    "Atención personalizada para tu rubro"
+  ],
+  "address": "Buenos Aires, Argentina",
+  "hours": "Lunes a sábados de 9 a 19 hs",
+  "instagram": "https://instagram.com/bairesbeef",
+  "email": "contacto@bairesbeef.com.ar",
+  "minOrderNote": "Pedido mínimo mayorista: 20 kg"
+}

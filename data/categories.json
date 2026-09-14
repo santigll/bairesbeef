@@ -1,0 +1,8 @@
+[
+  { "id": "cat-vacuna", "slug": "vacuna", "name": "Carne Vacuna", "order": 1 },
+  { "id": "cat-cerdo", "slug": "cerdo", "name": "Cerdo", "order": 2 },
+  { "id": "cat-pollo", "slug": "pollo", "name": "Pollo", "order": 3 },
+  { "id": "cat-embutidos", "slug": "embutidos", "name": "Embutidos", "order": 4 },
+  { "id": "cat-achuras", "slug": "achuras", "name": "Achuras", "order": 5 },
+  { "id": "cat-combos", "slug": "combos", "name": "Combos Parrilleros", "order": 6 }
+]
