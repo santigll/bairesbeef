@@ -41,6 +41,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# uploaded product/logo images (persisted at runtime, not source)
-/data/uploads/*
-!/data/uploads/.gitkeep
+# runtime data: mutable copy of data-seed/, plus uploaded photos.
+# Lives on a persistent volume in production; self-heals from data-seed/
+# if missing (see src/lib/data.ts). Not source, so not tracked. Both
+# data/*.json and data/uploads/ are created on demand by the app.
+/data/

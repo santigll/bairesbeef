@@ -27,11 +27,17 @@ desde el panel se guardan en `data/uploads/` y se sirven por una ruta propia
 (`/uploads/<archivo>`) — así, con un único disco persistente montado en
 `/app/data` alcanza para que no se pierda nada (precios, categorías y fotos).
 
+`data/` es contenido generado en tiempo de ejecución, no se versiona. La
+primera vez que arranca (o si `data/` está vacío, por ejemplo un volume
+recién montado) se auto-completa copiando los datos de ejemplo desde
+`data-seed/` — esa carpeta sí va en el repo y es la que podés editar si
+querés cambiar los cortes de ejemplo antes de tu primer deploy.
+
 ## Antes de poner esto en producción
 
 1. **Cargá tu WhatsApp real.** Por defecto están en `5491100000000`
    (placeholder). Cambialos desde `/admin/configuracion` apenas tengas
-   acceso, o editando `data/settings.json` antes de desplegar.
+   acceso, o editando `data-seed/settings.json` antes del primer deploy.
 2. **Cambiá el usuario y contraseña del admin.** Están definidos por
    variables de entorno:
 
