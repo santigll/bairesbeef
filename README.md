@@ -23,7 +23,9 @@ panel de administración para cambiar precios y fotos de cada corte.
 
 Los datos de productos, categorías y configuración se guardan en archivos
 JSON dentro de `data/` (sin base de datos externa). Las fotos que se suben
-desde el panel se guardan en `public/uploads/`.
+desde el panel se guardan en `data/uploads/` y se sirven por una ruta propia
+(`/uploads/<archivo>`) — así, con un único disco persistente montado en
+`/app/data` alcanza para que no se pierda nada (precios, categorías y fotos).
 
 ## Antes de poner esto en producción
 
@@ -67,8 +69,9 @@ npm run start
 ## Importante sobre el hosting
 
 Este proyecto guarda los datos (`data/*.json`) y las fotos subidas
-(`public/uploads/`) **escribiendo archivos en el disco del servidor**. Esto
-funciona perfecto en:
+(`data/uploads/`) **escribiendo archivos en el disco del servidor**, todo
+dentro de la misma carpeta `data/` para que un solo disco persistente
+alcance. Esto funciona perfecto en:
 
 - Un VPS o servidor propio corriendo `npm run start` (Node.js) — con o sin
   Docker.

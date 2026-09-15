@@ -42,5 +42,5 @@ yarn-error.log*
 next-env.d.ts
 
 # uploaded product/logo images (persisted at runtime, not source)
-/public/uploads/*
-!/public/uploads/.gitkeep
+/data/uploads/*
+!/data/uploads/.gitkeep

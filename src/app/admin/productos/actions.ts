@@ -59,10 +59,6 @@ export async function upsertProduct(formData: FormData) {
     products[index] = {
       ...existing,
       name,
-      slug:
-        slugify(name) === existing.slug
-          ? existing.slug
-          : await uniqueSlug(slugify(name), products, id),
       categoryId,
       unit,
       price: Number.isFinite(price) ? price : existing.price,

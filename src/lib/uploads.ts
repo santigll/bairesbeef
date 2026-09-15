@@ -1,11 +1,18 @@
 import { promises as fs } from "fs";
 import path from "path";
 
-const UPLOADS_DIR = path.join(process.cwd(), "public", "uploads");
+// Stored under data/ (not public/) so a single persistent volume mounted at
+// /app/data covers both the JSON data files and every uploaded photo.
+export const UPLOADS_DIR = path.join(process.cwd(), "data", "uploads");
 const ALLOWED_TYPES: Record<string, string> = {
   "image/jpeg": "jpg",
   "image/png": "png",
   "image/webp": "webp",
+};
+export const CONTENT_TYPE_BY_EXT: Record<string, string> = {
+  jpg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
 };
 const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 
