@@ -1,6 +1,7 @@
 import Image from "next/image";
 import AdminShell from "@/components/admin/AdminShell";
 import ProductVariantFields from "@/components/admin/ProductVariantFields";
+import ImportProductsForm from "@/components/admin/ImportProductsForm";
 import { getCategories, getProducts, getVariantGroups } from "@/lib/data";
 import { formatPrice } from "@/lib/whatsapp";
 import type { VariantGroup } from "@/lib/types";
@@ -19,6 +20,30 @@ export default async function AdminProductosPage() {
   return (
     <AdminShell>
       <div className="space-y-8">
+        <section className="rounded-2xl border border-line bg-white p-6">
+          <h2 className="font-display text-2xl tracking-wide text-ink">
+            Importar / exportar
+          </h2>
+          <p className="mt-1 text-sm text-ink/60">
+            Para cargar o actualizar muchos productos a la vez (por ejemplo,
+            todos los precios): exportá el catálogo actual a CSV, editalo en
+            Excel o Google Sheets, y volvé a importarlo. Cada fila se
+            identifica por su <span className="font-medium">código</span>: si
+            el código ya existe se actualiza ese producto, si no existe se
+            crea uno nuevo. Las fotos y las variantes no se manejan por CSV,
+            esas se cargan a mano en cada producto.
+          </p>
+          <div className="mt-4 flex flex-wrap items-center gap-4">
+            <a
+              href="/admin/productos/export"
+              className="rounded-lg border border-line px-4 py-2 text-sm font-medium text-ink/70 hover:border-ink/40"
+            >
+              Descargar catálogo actual (CSV)
+            </a>
+            <ImportProductsForm />
+          </div>
+        </section>
+
         <section className="rounded-2xl border border-line bg-white p-6">
           <h2 className="font-display text-2xl tracking-wide text-ink">
             Nuevo producto
@@ -63,6 +88,7 @@ export default async function AdminProductosPage() {
                           )}
                         </p>
                         <p className="text-xs text-ink/50">
+                          <span className="font-mono">{product.code}</span> ·{" "}
                           {categoryName(product.categoryId)} ·{" "}
                           {formatPrice(product.price)} / {product.unit}
                         </p>
@@ -108,6 +134,7 @@ function ProductForm({
   variantGroups: VariantGroup[];
   product?: {
     id: string;
+    code: string;
     name: string;
     categoryId: string;
     unit: string;
@@ -124,6 +151,19 @@ function ProductForm({
   return (
     <form action={upsertProduct} className="grid gap-4 sm:grid-cols-2">
       {product && <input type="hidden" name="id" value={product.id} />}
+
+      <div>
+        <label className="mb-1 block text-sm font-medium text-ink/70">
+          Código {!product && "(vacío = se genera solo)"}
+        </label>
+        <input
+          name="code"
+          type="text"
+          defaultValue={product?.code}
+          placeholder="Ej: VAC-009"
+          className="w-full rounded-lg border border-line px-3 py-2 text-sm font-mono uppercase"
+        />
+      </div>
 
       <div>
         <label className="mb-1 block text-sm font-medium text-ink/70">

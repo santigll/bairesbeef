@@ -2,6 +2,7 @@
   {
     "id": "p-asado",
     "slug": "asado-tira",
+    "code": "VAC-001",
     "name": "Asado de tira",
     "categoryId": "cat-vacuna",
     "unit": "kg",
@@ -12,7 +13,12 @@
     "featured": true,
     "order": 1,
     "variantGroupId": "vg-tiras-asado",
-    "variantOptionKeys": ["tiras-2cm", "tiras-4cm", "tiras-6cm", "tiras-8cm"],
+    "variantOptionKeys": [
+      "tiras-2cm",
+      "tiras-4cm",
+      "tiras-6cm",
+      "tiras-8cm"
+    ],
     "optionNotes": {
       "tiras-2cm": "~250g c/tira aprox.",
       "tiras-4cm": "~450g c/tira aprox.",
@@ -23,6 +29,7 @@
   {
     "id": "p-costillar-cerdo",
     "slug": "costillar-de-cerdo",
+    "code": "CER-001",
     "name": "Costillar de cerdo",
     "categoryId": "cat-cerdo",
     "unit": "kg",
@@ -33,11 +40,18 @@
     "featured": true,
     "order": 1,
     "variantGroupId": "vg-marcado",
-    "variantOptionKeys": ["sin-marcar", "1-marca", "2-marcas", "3-marcas", "4-marcas"]
+    "variantOptionKeys": [
+      "sin-marcar",
+      "1-marca",
+      "2-marcas",
+      "3-marcas",
+      "4-marcas"
+    ]
   },
   {
     "id": "p-pollo-entero",
     "slug": "pollo-entero",
+    "code": "POL-001",
     "name": "Pollo entero",
     "categoryId": "cat-pollo",
     "unit": "kg",
@@ -51,6 +65,7 @@
   {
     "id": "p-chorizo",
     "slug": "chorizo-parrillero",
+    "code": "EMB-001",
     "name": "Chorizo parrillero",
     "categoryId": "cat-embutidos",
     "unit": "kg",
@@ -61,11 +76,15 @@
     "featured": true,
     "order": 1,
     "variantGroupId": "vg-composicion",
-    "variantOptionKeys": ["puro-cerdo", "mezcla"]
+    "variantOptionKeys": [
+      "puro-cerdo",
+      "mezcla"
+    ]
   },
   {
     "id": "p-mollejas",
     "slug": "mollejas",
+    "code": "ACH-001",
     "name": "Mollejas",
     "categoryId": "cat-achuras",
     "unit": "kg",
@@ -79,6 +98,7 @@
   {
     "id": "p-combo-finde",
     "slug": "combo-finde-asador",
+    "code": "COM-001",
     "name": "Combo Finde Asador (5kg)",
     "categoryId": "cat-combos",
     "unit": "unidad",
@@ -92,6 +112,7 @@
   {
     "id": "p-vacio",
     "slug": "vacio",
+    "code": "VAC-002",
     "name": "Vacío",
     "categoryId": "cat-vacuna",
     "unit": "kg",
@@ -102,11 +123,16 @@
     "featured": true,
     "order": 2,
     "variantGroupId": "vg-corte-especial",
-    "variantOptionKeys": ["sin-cortar", "corte-rana", "corte-vertical"]
+    "variantOptionKeys": [
+      "sin-cortar",
+      "corte-rana",
+      "corte-vertical"
+    ]
   },
   {
     "id": "p-bondiola",
     "slug": "bondiola-de-cerdo",
+    "code": "CER-002",
     "name": "Bondiola de cerdo",
     "categoryId": "cat-cerdo",
     "unit": "kg",
@@ -120,6 +146,7 @@
   {
     "id": "p-supremas",
     "slug": "supremas-de-pollo",
+    "code": "POL-002",
     "name": "Supremas de pollo",
     "categoryId": "cat-pollo",
     "unit": "kg",
@@ -133,6 +160,7 @@
   {
     "id": "p-morcilla",
     "slug": "morcilla",
+    "code": "EMB-002",
     "name": "Morcilla",
     "categoryId": "cat-embutidos",
     "unit": "kg",
@@ -146,6 +174,7 @@
   {
     "id": "p-chinchulines",
     "slug": "chinchulines",
+    "code": "ACH-002",
     "name": "Chinchulines",
     "categoryId": "cat-achuras",
     "unit": "kg",
@@ -159,6 +188,7 @@
   {
     "id": "p-combo-familiar",
     "slug": "combo-familiar",
+    "code": "COM-002",
     "name": "Combo Familiar (2,5kg)",
     "categoryId": "cat-combos",
     "unit": "unidad",
@@ -172,6 +202,7 @@
   {
     "id": "p-entrana",
     "slug": "entrana",
+    "code": "VAC-003",
     "name": "Entraña",
     "categoryId": "cat-vacuna",
     "unit": "kg",
@@ -185,6 +216,7 @@
   {
     "id": "p-matambrito-cerdo",
     "slug": "matambrito-de-cerdo",
+    "code": "CER-003",
     "name": "Matambrito de cerdo",
     "categoryId": "cat-cerdo",
     "unit": "kg",
@@ -198,6 +230,7 @@
   {
     "id": "p-pata-muslo",
     "slug": "pata-muslo",
+    "code": "POL-003",
     "name": "Pata muslo",
     "categoryId": "cat-pollo",
     "unit": "kg",
@@ -211,6 +244,7 @@
   {
     "id": "p-longaniza",
     "slug": "longaniza",
+    "code": "EMB-003",
     "name": "Longaniza",
     "categoryId": "cat-embutidos",
     "unit": "kg",
@@ -224,6 +258,7 @@
   {
     "id": "p-riñon",
     "slug": "rinon",
+    "code": "ACH-003",
     "name": "Riñón",
     "categoryId": "cat-achuras",
     "unit": "kg",
@@ -237,6 +272,7 @@
   {
     "id": "p-matambre",
     "slug": "matambre",
+    "code": "VAC-004",
     "name": "Matambre",
     "categoryId": "cat-vacuna",
     "unit": "kg",
@@ -250,6 +286,7 @@
   {
     "id": "p-bife-chorizo",
     "slug": "bife-de-chorizo",
+    "code": "VAC-005",
     "name": "Bife de chorizo",
     "categoryId": "cat-vacuna",
     "unit": "kg",
@@ -260,11 +297,16 @@
     "featured": true,
     "order": 5,
     "variantGroupId": "vg-bifes",
-    "variantOptionKeys": ["bifes-2cm", "bifes-4cm", "bifes-6cm"]
+    "variantOptionKeys": [
+      "bifes-2cm",
+      "bifes-4cm",
+      "bifes-6cm"
+    ]
   },
   {
     "id": "p-lomo",
     "slug": "lomo",
+    "code": "VAC-006",
     "name": "Lomo",
     "categoryId": "cat-vacuna",
     "unit": "kg",
@@ -278,6 +320,7 @@
   {
     "id": "p-colita-cuadril",
     "slug": "colita-de-cuadril",
+    "code": "VAC-007",
     "name": "Colita de cuadril",
     "categoryId": "cat-vacuna",
     "unit": "kg",
@@ -291,6 +334,7 @@
   {
     "id": "p-carne-picada",
     "slug": "carne-picada-especial",
+    "code": "VAC-008",
     "name": "Carne picada especial",
     "categoryId": "cat-vacuna",
     "unit": "kg",
@@ -301,6 +345,10 @@
     "featured": false,
     "order": 8,
     "variantGroupId": "vg-picado",
-    "variantOptionKeys": ["sin-picar", "picado-1", "picado-2"]
+    "variantOptionKeys": [
+      "sin-picar",
+      "picado-1",
+      "picado-2"
+    ]
   }
 ]

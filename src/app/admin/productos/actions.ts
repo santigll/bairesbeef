@@ -9,6 +9,7 @@ import {
   saveProducts,
   slugify,
 } from "@/lib/data";
+import { resolveProductCode, uniqueSlug } from "@/lib/product-helpers";
 import { saveUploadedImage } from "@/lib/uploads";
 import type { Product, Unit } from "@/lib/types";
 
@@ -49,21 +50,9 @@ async function parseVariantFields(formData: FormData): Promise<{
   return { variantGroupId, variantOptionKeys, optionNotes };
 }
 
-async function uniqueSlug(base: string, products: Product[], ignoreId?: string) {
-  const taken = new Set(
-    products.filter((p) => p.id !== ignoreId).map((p) => p.slug)
-  );
-  let slug = base || "producto";
-  let i = 2;
-  while (taken.has(slug)) {
-    slug = `${base}-${i}`;
-    i += 1;
-  }
-  return slug;
-}
-
 export async function upsertProduct(formData: FormData) {
   const id = String(formData.get("id") || "");
+  const code = String(formData.get("code") || "").trim().toUpperCase();
   const name = String(formData.get("name") || "").trim();
   const categoryId = String(formData.get("categoryId") || "");
   const unit = (String(formData.get("unit") || "kg") as Unit) === "unidad" ? "unidad" : "kg";
@@ -91,6 +80,7 @@ export async function upsertProduct(formData: FormData) {
     const existing = products[index];
     products[index] = {
       ...existing,
+      code: resolveProductCode(code, products, id),
       name,
       categoryId,
       unit,
@@ -102,13 +92,14 @@ export async function upsertProduct(formData: FormData) {
       ...variantFields,
     };
   } else {
-    const slug = await uniqueSlug(slugify(name), products);
+    const slug = uniqueSlug(slugify(name), products);
     const maxOrder = products
       .filter((p) => p.categoryId === categoryId)
       .reduce((max, p) => Math.max(max, p.order), 0);
     const newProduct: Product = {
       id: generateId("p"),
       slug,
+      code: resolveProductCode(code, products),
       name,
       categoryId,
       unit,

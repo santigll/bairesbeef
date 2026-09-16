@@ -20,7 +20,14 @@ panel de administración para cambiar precios y fotos de cada corte.
 - **`/admin`** — Panel protegido con usuario/contraseña para gestionar:
   - **Productos**: alta/edición/baja, precio, unidad (kg o unidad), foto,
     activo/inactivo, destacado en el home, y variante de presentación
-    (ver abajo).
+    (ver abajo). Cada producto tiene un **código** único (SKU); desde la
+    misma página se puede **exportar el catálogo a CSV** y volver a
+    **importarlo** (por ejemplo después de editar precios en Excel o Google
+    Sheets) — el código es la clave: si ya existe se actualiza ese
+    producto, si no existe se crea uno nuevo, y las categorías que no
+    existan todavía se crean solas. Sirve tanto para la carga inicial
+    masiva como para actualizaciones de precios en bloque. Fotos y
+    variantes quedan fuera del CSV, esas se cargan a mano por producto.
   - **Categorías**: alta/edición/orden/baja.
   - **Variantes**: formas de presentación reutilizables (picado, bifes,
     tiras, marcado, corte especial, composición, etc.), cada una con sus
