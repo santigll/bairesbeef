@@ -124,3 +124,34 @@ export async function deleteProduct(formData: FormData) {
   await saveProducts(products.filter((p) => p.id !== id));
   revalidatePublicPages();
 }
+
+export async function moveProduct(formData: FormData) {
+  const id = String(formData.get("id") || "");
+  const direction = String(formData.get("direction") || "");
+  const products = await getProducts(); // already sorted by order
+
+  const product = products.find((p) => p.id === id);
+  if (!product) return;
+
+  // Order is only meaningful relative to siblings in the same category
+  // (that's the list a shopper actually browses), so reordering swaps
+  // within that category rather than across the whole catalog.
+  const siblings = products.filter((p) => p.categoryId === product.categoryId);
+  const index = siblings.findIndex((p) => p.id === id);
+  const swapWith = direction === "up" ? index - 1 : index + 1;
+  if (index === -1 || swapWith < 0 || swapWith >= siblings.length) return;
+
+  const a = siblings[index];
+  const b = siblings[swapWith];
+  const orderA = a.order;
+  const orderB = b.order;
+
+  const updated = products.map((p) => {
+    if (p.id === a.id) return { ...p, order: orderB };
+    if (p.id === b.id) return { ...p, order: orderA };
+    return p;
+  });
+
+  await saveProducts(updated);
+  revalidatePublicPages();
+}

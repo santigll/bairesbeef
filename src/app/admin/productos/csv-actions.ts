@@ -9,7 +9,7 @@ import {
   saveProducts,
   slugify,
 } from "@/lib/data";
-import { parseCsvRows } from "@/lib/csv";
+import { parseCsvRows, pick } from "@/lib/csv";
 import { generateCode, uniqueCode } from "@/lib/product-helpers";
 import type { Product, Unit } from "@/lib/types";
 
@@ -62,36 +62,38 @@ export async function importProducts(
 
   rows.forEach((row, i) => {
     const line = i + 2; // header is line 1
-    const codigo = String(row.codigo || "").trim().toUpperCase();
-    const nombre = String(row.nombre || "").trim();
-    const categoriaNombre = String(row.categoria || "").trim();
-    const precioRaw = String(row.precio || "").trim().replace(",", ".");
-    const unidadRaw = String(row.unidad || "kg").trim().toLowerCase();
-    const descripcion = String(row.descripcion || "").trim();
+    const codigo = pick(row, ["codigo", "código", "code", "sku"]).toUpperCase();
+    const nombre = pick(row, ["nombre", "corte", "producto", "name"]);
+    const categoriaNombre = pick(row, ["categoria", "categoría", "especie", "category"]);
+    const precioRaw = pick(row, ["precio", "price"]).replace(",", ".");
+    const unidadRaw = pick(row, ["unidad", "unit"]).toLowerCase();
+    const descripcion = pick(row, ["descripcion", "descripción", "description"]);
 
     if (!nombre) {
-      errors.push(`Fila ${line}: falta el nombre.`);
+      errors.push(`Fila ${line}: falta el nombre (columna "nombre" o "corte").`);
       return;
     }
 
     const precio = Number(precioRaw);
     if (!precioRaw || !Number.isFinite(precio) || precio < 0) {
-      errors.push(`Fila ${line} (${nombre}): precio inválido ("${row.precio ?? ""}").`);
+      errors.push(`Fila ${line} (${nombre}): precio inválido ("${precioRaw}").`);
       return;
     }
 
+    // No column, or blank: most cuts sell by weight, so default to kg
+    // instead of rejecting the row.
     let unit: Unit;
-    if (unidadRaw === "kg" || unidadRaw === "unidad") {
-      unit = unidadRaw;
+    if (!unidadRaw || unidadRaw === "kg") {
+      unit = "kg";
+    } else if (unidadRaw === "unidad") {
+      unit = "unidad";
     } else {
-      errors.push(
-        `Fila ${line} (${nombre}): unidad inválida ("${row.unidad ?? ""}"), usá "kg" o "unidad".`
-      );
+      errors.push(`Fila ${line} (${nombre}): unidad inválida ("${unidadRaw}"), usá "kg" o "unidad".`);
       return;
     }
 
     if (!categoriaNombre) {
-      errors.push(`Fila ${line} (${nombre}): falta la categoría.`);
+      errors.push(`Fila ${line} (${nombre}): falta la categoría (columna "categoria" o "especie").`);
       return;
     }
 
@@ -109,8 +111,8 @@ export async function importProducts(
     }
     const categoryId = category.id;
 
-    const active = parseBool(String(row.activo ?? ""), true);
-    const featured = parseBool(String(row.destacado ?? ""), false);
+    const active = parseBool(pick(row, ["activo", "active"]), true);
+    const featured = parseBool(pick(row, ["destacado", "featured"]), false);
 
     const existingIndex = codigo ? products.findIndex((p) => p.code === codigo) : -1;
 

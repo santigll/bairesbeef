@@ -5,7 +5,7 @@ import ImportProductsForm from "@/components/admin/ImportProductsForm";
 import { getCategories, getProducts, getVariantGroups } from "@/lib/data";
 import { formatPrice } from "@/lib/whatsapp";
 import type { VariantGroup } from "@/lib/types";
-import { deleteProduct, upsertProduct } from "./actions";
+import { deleteProduct, moveProduct, upsertProduct } from "./actions";
 
 export default async function AdminProductosPage() {
   const [products, categories, variantGroups] = await Promise.all([
@@ -14,8 +14,15 @@ export default async function AdminProductosPage() {
     getVariantGroups(),
   ]);
 
-  const categoryName = (id: string) =>
-    categories.find((c) => c.id === id)?.name || "Sin categoría";
+  const productsByCategory = categories.map((category) => ({
+    category,
+    products: products
+      .filter((p) => p.categoryId === category.id)
+      .sort((a, b) => a.order - b.order),
+  }));
+  const uncategorized = products.filter(
+    (p) => !categories.some((c) => c.id === p.categoryId)
+  );
 
   return (
     <AdminShell>
@@ -52,76 +59,172 @@ export default async function AdminProductosPage() {
         </section>
 
         <section>
-          <h2 className="mb-4 font-display text-2xl tracking-wide text-ink">
+          <h2 className="mb-1 font-display text-2xl tracking-wide text-ink">
             Productos ({products.length})
           </h2>
+          <p className="mb-4 text-sm text-ink/60">
+            El orden dentro de cada categoría es el orden en que se muestran
+            los cortes en la tienda — usá las flechas para acomodarlo.
+          </p>
 
           {categories.length === 0 ? (
             <p className="text-ink/60">Creá primero una categoría.</p>
           ) : (
-            <div className="space-y-3">
-              {products.map((product) => (
-                <details
-                  key={product.id}
-                  className="group rounded-xl border border-line bg-white"
-                >
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="relative h-12 w-12 flex-none overflow-hidden rounded-lg bg-paper-alt">
-                        {product.imageUrl && (
-                          <Image
-                            src={product.imageUrl}
-                            alt={product.name}
-                            fill
-                            sizes="48px"
-                            className="object-cover"
-                          />
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-medium text-ink">
-                          {product.name}{" "}
-                          {!product.active && (
-                            <span className="ml-1 rounded bg-line px-1.5 py-0.5 text-xs text-ink/50">
-                              inactivo
-                            </span>
-                          )}
-                        </p>
-                        <p className="text-xs text-ink/50">
-                          <span className="font-mono">{product.code}</span> ·{" "}
-                          {categoryName(product.categoryId)} ·{" "}
-                          {formatPrice(product.price)} / {product.unit}
-                        </p>
-                      </div>
+            <div className="space-y-8">
+              {productsByCategory.map(({ category, products: catProducts }) => (
+                <div key={category.id}>
+                  <h3 className="mb-3 font-display text-lg tracking-wide text-ink/70">
+                    {category.name} ({catProducts.length})
+                  </h3>
+                  {catProducts.length === 0 ? (
+                    <p className="text-sm text-ink/40">Sin productos todavía.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {catProducts.map((product, i) => (
+                        <ProductRow
+                          key={product.id}
+                          product={product}
+                          categories={categories}
+                          variantGroups={variantGroups}
+                          isFirst={i === 0}
+                          isLast={i === catProducts.length - 1}
+                        />
+                      ))}
                     </div>
-                    <span className="text-sm text-ink/40 group-open:rotate-180 transition-transform">
-                      ▾
-                    </span>
-                  </summary>
-
-                  <div className="border-t border-line p-4">
-                    <ProductForm
-                      categories={categories}
-                      variantGroups={variantGroups}
-                      product={product}
-                    />
-                    <form action={deleteProduct} className="mt-3">
-                      <input type="hidden" name="id" value={product.id} />
-                      <button
-                        type="submit"
-                        className="text-sm font-medium text-accent hover:underline"
-                      >
-                        Eliminar producto
-                      </button>
-                    </form>
-                  </div>
-                </details>
+                  )}
+                </div>
               ))}
+
+              {uncategorized.length > 0 && (
+                <div>
+                  <h3 className="mb-3 font-display text-lg tracking-wide text-ink/70">
+                    Sin categoría ({uncategorized.length})
+                  </h3>
+                  <div className="space-y-3">
+                    {uncategorized.map((product) => (
+                      <ProductRow
+                        key={product.id}
+                        product={product}
+                        categories={categories}
+                        variantGroups={variantGroups}
+                        isFirst
+                        isLast
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </section>
       </div>
     </AdminShell>
+  );
+}
+
+type AdminProduct = {
+  id: string;
+  code: string;
+  name: string;
+  categoryId: string;
+  unit: string;
+  price: number;
+  description: string;
+  active: boolean;
+  featured: boolean;
+  imageUrl: string;
+  variantGroupId?: string;
+  variantOptionKeys?: string[];
+  optionNotes?: Record<string, string>;
+};
+
+function ProductRow({
+  product,
+  categories,
+  variantGroups,
+  isFirst,
+  isLast,
+}: {
+  product: AdminProduct;
+  categories: { id: string; name: string }[];
+  variantGroups: VariantGroup[];
+  isFirst: boolean;
+  isLast: boolean;
+}) {
+  return (
+    <div className="flex items-stretch gap-2 rounded-xl border border-line bg-white p-4">
+      <div className="flex flex-none flex-col justify-center gap-0.5">
+        <form action={moveProduct}>
+          <input type="hidden" name="id" value={product.id} />
+          <input type="hidden" name="direction" value="up" />
+          <button
+            type="submit"
+            disabled={isFirst}
+            aria-label={`Subir ${product.name}`}
+            className="block leading-none text-ink/40 hover:text-ink disabled:opacity-20"
+          >
+            ▲
+          </button>
+        </form>
+        <form action={moveProduct}>
+          <input type="hidden" name="id" value={product.id} />
+          <input type="hidden" name="direction" value="down" />
+          <button
+            type="submit"
+            disabled={isLast}
+            aria-label={`Bajar ${product.name}`}
+            className="block leading-none text-ink/40 hover:text-ink disabled:opacity-20"
+          >
+            ▼
+          </button>
+        </form>
+      </div>
+
+      <details className="group flex-1">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="relative h-12 w-12 flex-none overflow-hidden rounded-lg bg-paper-alt">
+              {product.imageUrl && (
+                <Image
+                  src={product.imageUrl}
+                  alt={product.name}
+                  fill
+                  sizes="48px"
+                  className="object-cover"
+                />
+              )}
+            </div>
+            <div>
+              <p className="font-medium text-ink">
+                {product.name}{" "}
+                {!product.active && (
+                  <span className="ml-1 rounded bg-line px-1.5 py-0.5 text-xs text-ink/50">
+                    inactivo
+                  </span>
+                )}
+              </p>
+              <p className="text-xs text-ink/50">
+                <span className="font-mono">{product.code}</span> ·{" "}
+                {formatPrice(product.price)} / {product.unit}
+              </p>
+            </div>
+          </div>
+          <span className="text-sm text-ink/40 group-open:rotate-180 transition-transform">
+            ▾
+          </span>
+        </summary>
+
+        <div className="mt-4 border-t border-line pt-4">
+          <ProductForm categories={categories} variantGroups={variantGroups} product={product} />
+          <form action={deleteProduct} className="mt-3">
+            <input type="hidden" name="id" value={product.id} />
+            <button type="submit" className="text-sm font-medium text-accent hover:underline">
+              Eliminar producto
+            </button>
+          </form>
+        </div>
+      </details>
+    </div>
   );
 }
 
