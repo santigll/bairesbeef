@@ -44,6 +44,19 @@ export default function ProductCard({ product }: { product: ProductWithVariants 
           </p>
         )}
 
+        {product.cookingMethods.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1">
+            {product.cookingMethods.map((method) => (
+              <span
+                key={method}
+                className="rounded-full bg-paper-alt px-2 py-0.5 text-xs text-ink/60"
+              >
+                {method}
+              </span>
+            ))}
+          </div>
+        )}
+
         <div className="mt-2 flex items-baseline gap-1">
           <span className="text-lg font-bold text-accent">
             {formatPrice(product.price)}

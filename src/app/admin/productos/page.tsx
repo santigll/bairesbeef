@@ -4,7 +4,7 @@ import ProductVariantFields from "@/components/admin/ProductVariantFields";
 import ImportProductsForm from "@/components/admin/ImportProductsForm";
 import { getCategories, getProducts, getVariantGroups } from "@/lib/data";
 import { formatPrice } from "@/lib/whatsapp";
-import type { VariantGroup } from "@/lib/types";
+import { COOKING_METHODS, type VariantGroup } from "@/lib/types";
 import { deleteProduct, moveProduct, upsertProduct } from "./actions";
 
 export default async function AdminProductosPage() {
@@ -137,6 +137,7 @@ type AdminProduct = {
   active: boolean;
   featured: boolean;
   imageUrl: string;
+  cookingMethods: string[];
   variantGroupId?: string;
   variantOptionKeys?: string[];
   optionNotes?: Record<string, string>;
@@ -239,21 +240,7 @@ function ProductForm({
 }: {
   categories: { id: string; name: string }[];
   variantGroups: VariantGroup[];
-  product?: {
-    id: string;
-    code: string;
-    name: string;
-    categoryId: string;
-    unit: string;
-    price: number;
-    description: string;
-    active: boolean;
-    featured: boolean;
-    imageUrl: string;
-    variantGroupId?: string;
-    variantOptionKeys?: string[];
-    optionNotes?: Record<string, string>;
-  };
+  product?: AdminProduct;
 }) {
   return (
     <form action={upsertProduct} className="grid gap-4 sm:grid-cols-2">
@@ -368,6 +355,25 @@ function ProductForm({
         initialOptionKeys={product?.variantOptionKeys}
         initialNotes={product?.optionNotes}
       />
+
+      <div className="sm:col-span-2">
+        <label className="mb-1 block text-sm font-medium text-ink/70">
+          Cocción
+        </label>
+        <div className="flex flex-wrap gap-4">
+          {COOKING_METHODS.map((method) => (
+            <label key={method} className="flex items-center gap-2 text-sm text-ink/70">
+              <input
+                type="checkbox"
+                name="cookingMethods"
+                value={method}
+                defaultChecked={product?.cookingMethods?.includes(method)}
+              />
+              {method}
+            </label>
+          ))}
+        </div>
+      </div>
 
       <div className="flex items-center gap-6 sm:col-span-2">
         <label className="flex items-center gap-2 text-sm text-ink/70">

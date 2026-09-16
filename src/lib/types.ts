@@ -1,5 +1,14 @@
 export type Unit = "kg" | "unidad";
 
+export const COOKING_METHODS = [
+  "Parrilla",
+  "Horno",
+  "Plancha",
+  "Cacerola",
+  "Milanesa",
+] as const;
+export type CookingMethod = (typeof COOKING_METHODS)[number];
+
 export type Category = {
   id: string;
   slug: string;
@@ -20,6 +29,7 @@ export type Product = {
   active: boolean;
   featured: boolean;
   order: number;
+  cookingMethods: CookingMethod[];
   // Presentation variant (corte de picado, grosor de bifes, marcado, etc.).
   // Optional: most products have none. When set, variantOptionKeys picks
   // which of the group's options apply to THIS product (order preserved

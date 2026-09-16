@@ -73,6 +73,19 @@ export default function ProductModal({
               <p className="mt-2 text-sm text-ink/60">{product.description}</p>
             )}
 
+            {product.cookingMethods.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {product.cookingMethods.map((method) => (
+                  <span
+                    key={method}
+                    className="rounded-full bg-paper-alt px-2.5 py-1 text-xs text-ink/60"
+                  >
+                    {method}
+                  </span>
+                ))}
+              </div>
+            )}
+
             <div className="mt-4 flex items-baseline gap-1">
               <span className="text-2xl font-bold text-accent">
                 {formatPrice(product.price)}

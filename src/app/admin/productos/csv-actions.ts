@@ -9,7 +9,7 @@ import {
   saveProducts,
   slugify,
 } from "@/lib/data";
-import { parseCsvRows, pick } from "@/lib/csv";
+import { parseCookingMethods, parseCsvRows, pick } from "@/lib/csv";
 import { generateCode, uniqueCode } from "@/lib/product-helpers";
 import type { Product, Unit } from "@/lib/types";
 
@@ -117,6 +117,9 @@ export async function importProducts(
 
     const active = parseBool(pick(row, ["activo", "active"]), true);
     const featured = parseBool(pick(row, ["destacado", "featured"]), false);
+    const cookingMethods = parseCookingMethods(
+      pick(row, ["coccion", "cocción", "cooking"])
+    );
 
     const existingIndex = codigo ? products.findIndex((p) => p.code === codigo) : -1;
 
@@ -131,6 +134,7 @@ export async function importProducts(
         description: descripcion,
         active,
         featured,
+        cookingMethods,
       };
       touchedCodes.add(existing.code);
       updated += 1;
@@ -151,6 +155,7 @@ export async function importProducts(
         active,
         featured,
         order,
+        cookingMethods,
       };
       products.push(newProduct);
       touchedCodes.add(newProduct.code);

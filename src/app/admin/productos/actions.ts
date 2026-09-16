@@ -11,7 +11,15 @@ import {
 } from "@/lib/data";
 import { resolveProductCode, uniqueSlug } from "@/lib/product-helpers";
 import { saveUploadedImage } from "@/lib/uploads";
-import type { Product, Unit } from "@/lib/types";
+import { COOKING_METHODS, type CookingMethod, type Product, type Unit } from "@/lib/types";
+
+function parseCookingMethodsField(formData: FormData): CookingMethod[] {
+  const set = new Set(COOKING_METHODS);
+  return formData
+    .getAll("cookingMethods")
+    .map(String)
+    .filter((m): m is CookingMethod => set.has(m as CookingMethod));
+}
 
 function revalidatePublicPages() {
   revalidatePath("/admin/productos");
@@ -73,6 +81,7 @@ export async function upsertProduct(formData: FormData) {
   const products = await getProducts();
   const uploadedUrl = await saveUploadedImage(imageFile);
   const variantFields = await parseVariantFields(formData);
+  const cookingMethods = parseCookingMethodsField(formData);
 
   if (id) {
     const index = products.findIndex((p) => p.id === id);
@@ -88,6 +97,7 @@ export async function upsertProduct(formData: FormData) {
       description,
       active,
       featured,
+      cookingMethods,
       imageUrl: uploadedUrl ?? (removeImage ? "" : existing.imageUrl),
       ...variantFields,
     };
@@ -108,6 +118,7 @@ export async function upsertProduct(formData: FormData) {
       imageUrl: uploadedUrl ?? "",
       active,
       featured,
+      cookingMethods,
       order: maxOrder + 1,
       ...variantFields,
     };

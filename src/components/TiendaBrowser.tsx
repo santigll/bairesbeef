@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Category } from "@/lib/types";
+import { COOKING_METHODS, type Category, type CookingMethod } from "@/lib/types";
 import type { ProductWithVariants } from "@/lib/variants";
 import ProductCard from "./ProductCard";
 import CartSidebar from "./CartSidebar";
@@ -29,15 +29,27 @@ export default function TiendaBrowser({
       : "all";
   const [filter, setFilter] = useState<FilterId>(initialFilter);
   const [search, setSearch] = useState("");
+  const [cookingFilter, setCookingFilter] = useState<Set<CookingMethod>>(new Set());
+
+  function toggleCookingMethod(method: CookingMethod) {
+    setCookingFilter((prev) => {
+      const next = new Set(prev);
+      if (next.has(method)) next.delete(method);
+      else next.add(method);
+      return next;
+    });
+  }
 
   const filtered = useMemo(() => {
     return products.filter((p) => {
       const matchesFilter =
         filter === "destacados" ? p.featured : filter === "all" ? true : p.categoryId === filter;
       const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase());
-      return matchesFilter && matchesSearch;
+      const matchesCooking =
+        cookingFilter.size === 0 || p.cookingMethods.some((m) => cookingFilter.has(m));
+      return matchesFilter && matchesSearch && matchesCooking;
     });
-  }, [products, filter, search]);
+  }, [products, filter, search, cookingFilter]);
 
   const activeLabel =
     filter === "destacados"
@@ -74,6 +86,25 @@ export default function TiendaBrowser({
             />
           ))}
         </nav>
+
+        <p className="mb-3 mt-6 text-xs font-semibold uppercase tracking-wider text-ink/50">
+          Cocción
+        </p>
+        <div className="flex flex-wrap gap-2 lg:flex-col lg:gap-1">
+          {COOKING_METHODS.map((method) => (
+            <label
+              key={method}
+              className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-ink/70 hover:bg-white"
+            >
+              <input
+                type="checkbox"
+                checked={cookingFilter.has(method)}
+                onChange={() => toggleCookingMethod(method)}
+              />
+              {method}
+            </label>
+          ))}
+        </div>
       </aside>
 
       <div>

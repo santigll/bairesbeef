@@ -1,5 +1,5 @@
 import Papa from "papaparse";
-import type { Category, Product } from "./types";
+import { COOKING_METHODS, type Category, type CookingMethod, type Product } from "./types";
 
 export const PRODUCT_CSV_HEADERS = [
   "codigo",
@@ -10,6 +10,7 @@ export const PRODUCT_CSV_HEADERS = [
   "descripcion",
   "activo",
   "destacado",
+  "coccion",
 ] as const;
 
 export function productsToCsv(products: Product[], categories: Category[]): string {
@@ -23,6 +24,7 @@ export function productsToCsv(products: Product[], categories: Category[]): stri
     descripcion: p.description,
     activo: p.active ? "si" : "no",
     destacado: p.featured ? "si" : "no",
+    coccion: p.cookingMethods.join(", "),
   }));
   return Papa.unparse({ fields: [...PRODUCT_CSV_HEADERS], data: rows });
 }
@@ -41,6 +43,21 @@ export function pick(row: Record<string, string>, candidates: string[]): string 
     if (value != null && String(value).trim() !== "") return String(value).trim();
   }
   return "";
+}
+
+/**
+ * Splits a free-form "coccion" cell ("Parrilla, Horno" / "parrilla;horno")
+ * into our fixed set of cooking methods, matching case-insensitively and
+ * silently dropping anything that isn't one of the known values.
+ */
+export function parseCookingMethods(value: string): CookingMethod[] {
+  const found = new Set<CookingMethod>();
+  for (const part of value.split(/[,;/]/)) {
+    const normalized = part.trim().toLowerCase();
+    const match = COOKING_METHODS.find((m) => m.toLowerCase() === normalized);
+    if (match) found.add(match);
+  }
+  return [...found];
 }
 
 export function parseCsvRows(text: string): Record<string, string>[] {

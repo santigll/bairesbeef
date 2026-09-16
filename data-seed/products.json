@@ -24,7 +24,10 @@
       "tiras-4cm": "~450g c/tira aprox.",
       "tiras-6cm": "~650g c/tira aprox.",
       "tiras-8cm": "~850g c/tira aprox."
-    }
+    },
+    "cookingMethods": [
+      "Parrilla"
+    ]
   },
   {
     "id": "p-costillar-cerdo",
@@ -46,6 +49,9 @@
       "2-marcas",
       "3-marcas",
       "4-marcas"
+    ],
+    "cookingMethods": [
+      "Parrilla"
     ]
   },
   {
@@ -60,7 +66,10 @@
     "imageUrl": "",
     "active": true,
     "featured": false,
-    "order": 1
+    "order": 1,
+    "cookingMethods": [
+      "Horno"
+    ]
   },
   {
     "id": "p-chorizo",
@@ -79,6 +88,9 @@
     "variantOptionKeys": [
       "puro-cerdo",
       "mezcla"
+    ],
+    "cookingMethods": [
+      "Parrilla"
     ]
   },
   {
@@ -93,7 +105,10 @@
     "imageUrl": "",
     "active": true,
     "featured": true,
-    "order": 1
+    "order": 1,
+    "cookingMethods": [
+      "Parrilla"
+    ]
   },
   {
     "id": "p-combo-finde",
@@ -107,7 +122,10 @@
     "imageUrl": "",
     "active": true,
     "featured": true,
-    "order": 1
+    "order": 1,
+    "cookingMethods": [
+      "Parrilla"
+    ]
   },
   {
     "id": "p-vacio",
@@ -127,6 +145,10 @@
       "sin-cortar",
       "corte-rana",
       "corte-vertical"
+    ],
+    "cookingMethods": [
+      "Parrilla",
+      "Horno"
     ]
   },
   {
@@ -141,7 +163,11 @@
     "imageUrl": "",
     "active": true,
     "featured": false,
-    "order": 2
+    "order": 2,
+    "cookingMethods": [
+      "Parrilla",
+      "Horno"
+    ]
   },
   {
     "id": "p-supremas",
@@ -155,7 +181,11 @@
     "imageUrl": "",
     "active": true,
     "featured": false,
-    "order": 2
+    "order": 2,
+    "cookingMethods": [
+      "Plancha",
+      "Horno"
+    ]
   },
   {
     "id": "p-morcilla",
@@ -169,7 +199,10 @@
     "imageUrl": "",
     "active": true,
     "featured": false,
-    "order": 2
+    "order": 2,
+    "cookingMethods": [
+      "Parrilla"
+    ]
   },
   {
     "id": "p-chinchulines",
@@ -183,7 +216,10 @@
     "imageUrl": "",
     "active": true,
     "featured": false,
-    "order": 2
+    "order": 2,
+    "cookingMethods": [
+      "Parrilla"
+    ]
   },
   {
     "id": "p-combo-familiar",
@@ -197,7 +233,10 @@
     "imageUrl": "",
     "active": true,
     "featured": false,
-    "order": 2
+    "order": 2,
+    "cookingMethods": [
+      "Parrilla"
+    ]
   },
   {
     "id": "p-entrana",
@@ -211,7 +250,10 @@
     "imageUrl": "",
     "active": true,
     "featured": true,
-    "order": 3
+    "order": 3,
+    "cookingMethods": [
+      "Parrilla"
+    ]
   },
   {
     "id": "p-matambrito-cerdo",
@@ -225,7 +267,11 @@
     "imageUrl": "",
     "active": true,
     "featured": false,
-    "order": 3
+    "order": 3,
+    "cookingMethods": [
+      "Parrilla",
+      "Horno"
+    ]
   },
   {
     "id": "p-pata-muslo",
@@ -239,7 +285,11 @@
     "imageUrl": "",
     "active": true,
     "featured": false,
-    "order": 3
+    "order": 3,
+    "cookingMethods": [
+      "Horno",
+      "Parrilla"
+    ]
   },
   {
     "id": "p-longaniza",
@@ -253,7 +303,10 @@
     "imageUrl": "",
     "active": true,
     "featured": false,
-    "order": 3
+    "order": 3,
+    "cookingMethods": [
+      "Parrilla"
+    ]
   },
   {
     "id": "p-riñon",
@@ -267,7 +320,10 @@
     "imageUrl": "",
     "active": true,
     "featured": false,
-    "order": 3
+    "order": 3,
+    "cookingMethods": [
+      "Parrilla"
+    ]
   },
   {
     "id": "p-matambre",
@@ -281,7 +337,11 @@
     "imageUrl": "",
     "active": true,
     "featured": false,
-    "order": 4
+    "order": 4,
+    "cookingMethods": [
+      "Parrilla",
+      "Horno"
+    ]
   },
   {
     "id": "p-bife-chorizo",
@@ -301,6 +361,9 @@
       "bifes-2cm",
       "bifes-4cm",
       "bifes-6cm"
+    ],
+    "cookingMethods": [
+      "Parrilla"
     ]
   },
   {
@@ -315,7 +378,11 @@
     "imageUrl": "",
     "active": true,
     "featured": false,
-    "order": 6
+    "order": 6,
+    "cookingMethods": [
+      "Plancha",
+      "Parrilla"
+    ]
   },
   {
     "id": "p-colita-cuadril",
@@ -329,7 +396,10 @@
     "imageUrl": "",
     "active": true,
     "featured": false,
-    "order": 7
+    "order": 7,
+    "cookingMethods": [
+      "Parrilla"
+    ]
   },
   {
     "id": "p-carne-picada",
@@ -349,6 +419,10 @@
       "sin-picar",
       "picado-1",
       "picado-2"
+    ],
+    "cookingMethods": [
+      "Cacerola",
+      "Milanesa"
     ]
   }
 ]

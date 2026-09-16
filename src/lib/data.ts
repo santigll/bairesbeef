@@ -72,7 +72,12 @@ export async function saveCategories(categories: Category[]): Promise<void> {
 
 export async function getProducts(): Promise<Product[]> {
   const products = await readJson<Product[]>(PRODUCTS_FILE, PRODUCTS_SEED);
-  return products.sort((a, b) => a.order - b.order);
+  // Back-fill fields added after some products were already saved to disk
+  // (e.g. a deploy's existing data/products.json predating cookingMethods),
+  // so older records don't come back with the field simply missing.
+  return products
+    .map((p) => ({ ...p, cookingMethods: p.cookingMethods ?? [] }))
+    .sort((a, b) => a.order - b.order);
 }
 
 export async function getActiveProducts(): Promise<Product[]> {
