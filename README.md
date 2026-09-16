@@ -66,9 +66,9 @@ querés cambiar los cortes de ejemplo antes de tu primer deploy.
 
 ## Antes de poner esto en producción
 
-1. **Cargá tu WhatsApp real.** Por defecto están en `5491100000000`
-   (placeholder). Cambialos desde `/admin/configuracion` apenas tengas
-   acceso, o editando `data-seed/settings.json` antes del primer deploy.
+1. **WhatsApp**: ya cargado en `data-seed/settings.json`
+   (`5491124860266`, minorista y mayorista). Si en algún momento cambia, se
+   edita desde `/admin/configuracion`.
 2. **Cambiá el usuario y contraseña del admin.** Están definidos por
    variables de entorno:
 
