@@ -9,9 +9,15 @@ import {
   saveProducts,
   slugify,
 } from "@/lib/data";
-import { resolveProductCode, uniqueSlug } from "@/lib/product-helpers";
+import { MAX_VARIANT_SLOTS, resolveProductCode, uniqueSlug } from "@/lib/product-helpers";
 import { saveUploadedImage } from "@/lib/uploads";
-import { COOKING_METHODS, type CookingMethod, type Product, type Unit } from "@/lib/types";
+import {
+  COOKING_METHODS,
+  type CookingMethod,
+  type Product,
+  type ProductVariantSelection,
+  type Unit,
+} from "@/lib/types";
 
 function parseCookingMethodsField(formData: FormData): CookingMethod[] {
   const set = new Set(COOKING_METHODS);
@@ -27,35 +33,40 @@ function revalidatePublicPages() {
   revalidatePath("/tienda");
 }
 
-async function parseVariantFields(formData: FormData): Promise<{
-  variantGroupId?: string;
-  variantOptionKeys?: string[];
-  optionNotes?: Record<string, string>;
-}> {
-  const variantGroupId = String(formData.get("variantGroupId") || "");
-  if (!variantGroupId) {
-    return { variantGroupId: undefined, variantOptionKeys: undefined, optionNotes: undefined };
-  }
-
+async function parseVariantFields(
+  formData: FormData
+): Promise<{ variantSelections: ProductVariantSelection[] }> {
   const groups = await getVariantGroups();
-  const group = groups.find((g) => g.id === variantGroupId);
-  if (!group) {
-    throw new Error("Variante no encontrada.");
+  const selections: ProductVariantSelection[] = [];
+  const usedGroupIds = new Set<string>();
+
+  for (let i = 0; i < MAX_VARIANT_SLOTS; i++) {
+    const groupId = String(formData.get(`variantGroupId_${i}`) || "");
+    if (!groupId) continue;
+
+    const group = groups.find((g) => g.id === groupId);
+    if (!group) throw new Error("Variante no encontrada.");
+    if (usedGroupIds.has(groupId)) {
+      throw new Error(`No podés elegir "${group.name}" dos veces en el mismo producto.`);
+    }
+    usedGroupIds.add(groupId);
+
+    const validKeys = new Set(group.options.map((o) => o.key));
+    const optionKeys = formData
+      .getAll(`variantOptionKeys_${i}`)
+      .map(String)
+      .filter((key) => validKeys.has(key));
+
+    const optionNotes: Record<string, string> = {};
+    for (const key of optionKeys) {
+      const note = String(formData.get(`optionNote_${i}_${key}`) || "").trim();
+      if (note) optionNotes[key] = note;
+    }
+
+    selections.push({ groupId, optionKeys, optionNotes });
   }
 
-  const validKeys = new Set(group.options.map((o) => o.key));
-  const variantOptionKeys = formData
-    .getAll("variantOptionKeys")
-    .map(String)
-    .filter((key) => validKeys.has(key));
-
-  const optionNotes: Record<string, string> = {};
-  for (const key of variantOptionKeys) {
-    const note = String(formData.get(`optionNote_${key}`) || "").trim();
-    if (note) optionNotes[key] = note;
-  }
-
-  return { variantGroupId, variantOptionKeys, optionNotes };
+  return { variantSelections: selections };
 }
 
 export async function upsertProduct(formData: FormData) {
@@ -70,6 +81,11 @@ export async function upsertProduct(formData: FormData) {
   const featured = formData.get("featured") === "on";
   const removeImage = formData.get("removeImage") === "on";
   const imageFile = formData.get("image") as File | null;
+  const approxWeightKgRaw = String(formData.get("approxWeightKg") || "").trim();
+  const approxWeightKg = approxWeightKgRaw ? Number(approxWeightKgRaw) : undefined;
+  if (approxWeightKgRaw && (!Number.isFinite(approxWeightKg) || (approxWeightKg as number) <= 0)) {
+    throw new Error("El peso aproximado tiene que ser un número mayor a 0.");
+  }
 
   if (!name) throw new Error("El nombre es obligatorio.");
 
@@ -98,6 +114,7 @@ export async function upsertProduct(formData: FormData) {
       active,
       featured,
       cookingMethods,
+      approxWeightKg,
       imageUrl: uploadedUrl ?? (removeImage ? "" : existing.imageUrl),
       ...variantFields,
     };
@@ -119,6 +136,7 @@ export async function upsertProduct(formData: FormData) {
       active,
       featured,
       cookingMethods,
+      approxWeightKg,
       order: maxOrder + 1,
       ...variantFields,
     };

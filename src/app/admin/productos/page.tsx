@@ -4,7 +4,7 @@ import ProductVariantFields from "@/components/admin/ProductVariantFields";
 import ImportProductsForm from "@/components/admin/ImportProductsForm";
 import { getCategories, getProducts, getVariantGroups } from "@/lib/data";
 import { formatPrice } from "@/lib/whatsapp";
-import { COOKING_METHODS, type VariantGroup } from "@/lib/types";
+import { COOKING_METHODS, type ProductVariantSelection, type VariantGroup } from "@/lib/types";
 import { deleteProduct, moveProduct, upsertProduct } from "./actions";
 
 export default async function AdminProductosPage() {
@@ -40,9 +40,11 @@ export default async function AdminProductosPage() {
             crea uno nuevo. Si tildás{" "}
             <span className="font-medium">&quot;Reemplazar catálogo completo&quot;</span>,
             además se elimina cualquier producto que no esté en el archivo
-            (útil para subir tu planilla maestra entera de una). Las fotos y
-            las variantes no se manejan por CSV, esas se cargan a mano en
-            cada producto.
+            (útil para subir tu planilla maestra entera de una). El CSV
+            también admite una columna opcional{" "}
+            <span className="font-mono">peso_aprox_kg</span> para el peso
+            aproximado. Las fotos y las variantes no se manejan por CSV, esas
+            se cargan a mano en cada producto.
           </p>
           <div className="mt-4 flex flex-wrap items-center gap-4">
             <a
@@ -138,9 +140,8 @@ type AdminProduct = {
   featured: boolean;
   imageUrl: string;
   cookingMethods: string[];
-  variantGroupId?: string;
-  variantOptionKeys?: string[];
-  optionNotes?: Record<string, string>;
+  variantSelections?: ProductVariantSelection[];
+  approxWeightKg?: number;
 };
 
 function ProductRow({
@@ -349,11 +350,31 @@ function ProductForm({
         )}
       </div>
 
+      <div>
+        <label className="mb-1 block text-sm font-medium text-ink/70">
+          Peso aprox. (kg)
+        </label>
+        <input
+          name="approxWeightKg"
+          type="number"
+          min={0}
+          step={0.01}
+          defaultValue={product?.approxWeightKg}
+          placeholder="Ej: 1.3"
+          className="w-full rounded-lg border border-line px-3 py-2 text-sm"
+        />
+        <p className="mt-1 text-xs text-ink/50">
+          Si el producto se vende <span className="font-medium">por kg</span>,
+          cargar esto habilita la opción de comprar &quot;la pieza
+          entera&quot; en la tienda (calcula el total automáticamente). Si se
+          vende <span className="font-medium">por unidad</span>, es solo
+          informativo y se muestra como &quot;≈X kg&quot;.
+        </p>
+      </div>
+
       <ProductVariantFields
         groups={variantGroups}
-        initialGroupId={product?.variantGroupId}
-        initialOptionKeys={product?.variantOptionKeys}
-        initialNotes={product?.optionNotes}
+        initialSelections={product?.variantSelections}
       />
 
       <div className="sm:col-span-2">

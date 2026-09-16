@@ -1,5 +1,9 @@
 import type { Product } from "./types";
 
+// A product can combine up to this many independent variant dimensions
+// at once (e.g. "Bifes de 4cm" AND "2 marcas" on the same cut).
+export const MAX_VARIANT_SLOTS = 3;
+
 export function uniqueSlug(base: string, products: Product[], ignoreId?: string): string {
   const taken = new Set(products.filter((p) => p.id !== ignoreId).map((p) => p.slug));
   let slug = base || "producto";

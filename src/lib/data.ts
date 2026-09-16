@@ -70,14 +70,42 @@ export async function saveCategories(categories: Category[]): Promise<void> {
   return enqueue(() => writeJson(CATEGORIES_FILE, categories));
 }
 
+// Shape products could have been saved in before variantSelections
+// replaced a single variantGroupId/variantOptionKeys/optionNotes trio.
+type LegacyProduct = Product & {
+  variantGroupId?: string;
+  variantOptionKeys?: string[];
+  optionNotes?: Record<string, string>;
+};
+
+// Back-fills fields added after some products were already saved to disk
+// (e.g. a deploy's existing data/products.json predating cookingMethods
+// or the move to multi-slot variants), so older records don't come back
+// with a field simply missing, or in a shape the rest of the app no
+// longer expects.
+function normalizeProduct(p: LegacyProduct): Product {
+  const variantSelections =
+    p.variantSelections ??
+    (p.variantGroupId
+      ? [
+          {
+            groupId: p.variantGroupId,
+            optionKeys: p.variantOptionKeys ?? [],
+            optionNotes: p.optionNotes ?? {},
+          },
+        ]
+      : []);
+
+  return {
+    ...p,
+    cookingMethods: p.cookingMethods ?? [],
+    variantSelections,
+  };
+}
+
 export async function getProducts(): Promise<Product[]> {
-  const products = await readJson<Product[]>(PRODUCTS_FILE, PRODUCTS_SEED);
-  // Back-fill fields added after some products were already saved to disk
-  // (e.g. a deploy's existing data/products.json predating cookingMethods),
-  // so older records don't come back with the field simply missing.
-  return products
-    .map((p) => ({ ...p, cookingMethods: p.cookingMethods ?? [] }))
-    .sort((a, b) => a.order - b.order);
+  const products = await readJson<LegacyProduct[]>(PRODUCTS_FILE, PRODUCTS_SEED);
+  return products.map(normalizeProduct).sort((a, b) => a.order - b.order);
 }
 
 export async function getActiveProducts(): Promise<Product[]> {

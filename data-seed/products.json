@@ -12,21 +12,25 @@
     "active": true,
     "featured": true,
     "order": 1,
-    "variantGroupId": "vg-tiras-asado",
-    "variantOptionKeys": [
-      "tiras-2cm",
-      "tiras-4cm",
-      "tiras-6cm",
-      "tiras-8cm"
-    ],
-    "optionNotes": {
-      "tiras-2cm": "~250g c/tira aprox.",
-      "tiras-4cm": "~450g c/tira aprox.",
-      "tiras-6cm": "~650g c/tira aprox.",
-      "tiras-8cm": "~850g c/tira aprox."
-    },
     "cookingMethods": [
       "Parrilla"
+    ],
+    "variantSelections": [
+      {
+        "groupId": "vg-tiras-asado",
+        "optionKeys": [
+          "tiras-2cm",
+          "tiras-4cm",
+          "tiras-6cm",
+          "tiras-8cm"
+        ],
+        "optionNotes": {
+          "tiras-2cm": "~250g c/tira aprox.",
+          "tiras-4cm": "~450g c/tira aprox.",
+          "tiras-6cm": "~650g c/tira aprox.",
+          "tiras-8cm": "~850g c/tira aprox."
+        }
+      }
     ]
   },
   {
@@ -42,16 +46,29 @@
     "active": true,
     "featured": true,
     "order": 1,
-    "variantGroupId": "vg-marcado",
-    "variantOptionKeys": [
-      "sin-marcar",
-      "1-marca",
-      "2-marcas",
-      "3-marcas",
-      "4-marcas"
-    ],
     "cookingMethods": [
       "Parrilla"
+    ],
+    "variantSelections": [
+      {
+        "groupId": "vg-marcado",
+        "optionKeys": [
+          "sin-marcar",
+          "1-marca",
+          "2-marcas",
+          "3-marcas",
+          "4-marcas"
+        ],
+        "optionNotes": {}
+      },
+      {
+        "groupId": "vg-corte-especial",
+        "optionKeys": [
+          "sin-cortar",
+          "trozado-4"
+        ],
+        "optionNotes": {}
+      }
     ]
   },
   {
@@ -69,7 +86,9 @@
     "order": 1,
     "cookingMethods": [
       "Horno"
-    ]
+    ],
+    "variantSelections": [],
+    "approxWeightKg": 1.8
   },
   {
     "id": "p-chorizo",
@@ -84,13 +103,18 @@
     "active": true,
     "featured": true,
     "order": 1,
-    "variantGroupId": "vg-composicion",
-    "variantOptionKeys": [
-      "puro-cerdo",
-      "mezcla"
-    ],
     "cookingMethods": [
       "Parrilla"
+    ],
+    "variantSelections": [
+      {
+        "groupId": "vg-composicion",
+        "optionKeys": [
+          "puro-cerdo",
+          "mezcla"
+        ],
+        "optionNotes": {}
+      }
     ]
   },
   {
@@ -108,7 +132,8 @@
     "order": 1,
     "cookingMethods": [
       "Parrilla"
-    ]
+    ],
+    "variantSelections": []
   },
   {
     "id": "p-combo-finde",
@@ -125,7 +150,9 @@
     "order": 1,
     "cookingMethods": [
       "Parrilla"
-    ]
+    ],
+    "variantSelections": [],
+    "approxWeightKg": 5
   },
   {
     "id": "p-vacio",
@@ -140,16 +167,22 @@
     "active": true,
     "featured": true,
     "order": 2,
-    "variantGroupId": "vg-corte-especial",
-    "variantOptionKeys": [
-      "sin-cortar",
-      "corte-rana",
-      "corte-vertical"
-    ],
     "cookingMethods": [
       "Parrilla",
       "Horno"
-    ]
+    ],
+    "variantSelections": [
+      {
+        "groupId": "vg-corte-especial",
+        "optionKeys": [
+          "sin-cortar",
+          "corte-rana",
+          "corte-vertical"
+        ],
+        "optionNotes": {}
+      }
+    ],
+    "approxWeightKg": 2.5
   },
   {
     "id": "p-bondiola",
@@ -167,7 +200,8 @@
     "cookingMethods": [
       "Parrilla",
       "Horno"
-    ]
+    ],
+    "variantSelections": []
   },
   {
     "id": "p-supremas",
@@ -185,7 +219,8 @@
     "cookingMethods": [
       "Plancha",
       "Horno"
-    ]
+    ],
+    "variantSelections": []
   },
   {
     "id": "p-morcilla",
@@ -202,7 +237,8 @@
     "order": 2,
     "cookingMethods": [
       "Parrilla"
-    ]
+    ],
+    "variantSelections": []
   },
   {
     "id": "p-chinchulines",
@@ -219,7 +255,8 @@
     "order": 2,
     "cookingMethods": [
       "Parrilla"
-    ]
+    ],
+    "variantSelections": []
   },
   {
     "id": "p-combo-familiar",
@@ -236,7 +273,9 @@
     "order": 2,
     "cookingMethods": [
       "Parrilla"
-    ]
+    ],
+    "variantSelections": [],
+    "approxWeightKg": 2.5
   },
   {
     "id": "p-entrana",
@@ -253,7 +292,8 @@
     "order": 3,
     "cookingMethods": [
       "Parrilla"
-    ]
+    ],
+    "variantSelections": []
   },
   {
     "id": "p-matambrito-cerdo",
@@ -271,7 +311,8 @@
     "cookingMethods": [
       "Parrilla",
       "Horno"
-    ]
+    ],
+    "variantSelections": []
   },
   {
     "id": "p-pata-muslo",
@@ -289,7 +330,8 @@
     "cookingMethods": [
       "Horno",
       "Parrilla"
-    ]
+    ],
+    "variantSelections": []
   },
   {
     "id": "p-longaniza",
@@ -306,7 +348,8 @@
     "order": 3,
     "cookingMethods": [
       "Parrilla"
-    ]
+    ],
+    "variantSelections": []
   },
   {
     "id": "p-riñon",
@@ -323,7 +366,8 @@
     "order": 3,
     "cookingMethods": [
       "Parrilla"
-    ]
+    ],
+    "variantSelections": []
   },
   {
     "id": "p-matambre",
@@ -341,7 +385,9 @@
     "cookingMethods": [
       "Parrilla",
       "Horno"
-    ]
+    ],
+    "variantSelections": [],
+    "approxWeightKg": 1.3
   },
   {
     "id": "p-bife-chorizo",
@@ -356,14 +402,19 @@
     "active": true,
     "featured": true,
     "order": 5,
-    "variantGroupId": "vg-bifes",
-    "variantOptionKeys": [
-      "bifes-2cm",
-      "bifes-4cm",
-      "bifes-6cm"
-    ],
     "cookingMethods": [
       "Parrilla"
+    ],
+    "variantSelections": [
+      {
+        "groupId": "vg-bifes",
+        "optionKeys": [
+          "bifes-2cm",
+          "bifes-4cm",
+          "bifes-6cm"
+        ],
+        "optionNotes": {}
+      }
     ]
   },
   {
@@ -382,7 +433,8 @@
     "cookingMethods": [
       "Plancha",
       "Parrilla"
-    ]
+    ],
+    "variantSelections": []
   },
   {
     "id": "p-colita-cuadril",
@@ -399,7 +451,8 @@
     "order": 7,
     "cookingMethods": [
       "Parrilla"
-    ]
+    ],
+    "variantSelections": []
   },
   {
     "id": "p-carne-picada",
@@ -414,15 +467,20 @@
     "active": true,
     "featured": false,
     "order": 8,
-    "variantGroupId": "vg-picado",
-    "variantOptionKeys": [
-      "sin-picar",
-      "picado-1",
-      "picado-2"
-    ],
     "cookingMethods": [
       "Cacerola",
       "Milanesa"
+    ],
+    "variantSelections": [
+      {
+        "groupId": "vg-picado",
+        "optionKeys": [
+          "sin-picar",
+          "picado-1",
+          "picado-2"
+        ],
+        "optionNotes": {}
+      }
     ]
   }
 ]

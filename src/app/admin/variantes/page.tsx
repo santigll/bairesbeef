@@ -6,7 +6,8 @@ export default async function AdminVariantesPage() {
   const [groups, products] = await Promise.all([getVariantGroups(), getProducts()]);
 
   const productCountFor = (groupId: string) =>
-    products.filter((p) => p.variantGroupId === groupId).length;
+    products.filter((p) => p.variantSelections?.some((sel) => sel.groupId === groupId))
+      .length;
 
   return (
     <AdminShell>

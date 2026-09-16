@@ -91,6 +91,11 @@ export default function ProductModal({
                 {formatPrice(product.price)}
               </span>
               <span className="text-sm text-ink/50">/ {product.unit}</span>
+              {product.unit === "unidad" && product.approxWeightKg && (
+                <span className="text-sm text-ink/40">
+                  (≈{product.approxWeightKg}kg)
+                </span>
+              )}
             </div>
 
             <div className="mt-6">

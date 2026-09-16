@@ -21,9 +21,12 @@ export default function CartSidebar({
       "",
       ...items.map((i) => {
         const variant = i.variantLabel ? ` (${i.variantLabel})` : "";
-        return `• ${i.name}${variant} — ${i.qty} ${i.unit === "kg" ? "kg" : "u."} (${formatPrice(
-          i.price * i.qty
-        )})`;
+        const qtyLabel = i.pieceMode
+          ? `${i.qty} pieza${i.qty === 1 ? "" : "s"} entera${i.qty === 1 ? "" : "s"}${
+              i.pieceApproxKg ? ` (≈${i.pieceApproxKg}kg c/u)` : ""
+            }`
+          : `${i.qty} ${i.unit === "kg" ? "kg" : "u."}`;
+        return `• ${i.name}${variant} — ${qtyLabel} (${formatPrice(i.price * i.qty)})`;
       }),
       "",
       `Total estimado: ${formatPrice(totalPrice)}`,
@@ -59,7 +62,11 @@ export default function CartSidebar({
                       <p className="text-xs text-ink/50">{item.variantLabel}</p>
                     )}
                     <p className="text-xs text-ink/40">
-                      {formatPrice(item.price)} / {item.unit}
+                      {item.pieceMode
+                        ? `${formatPrice(item.price)} / pieza${
+                            item.pieceApproxKg ? ` (≈${item.pieceApproxKg}kg)` : ""
+                          }`
+                        : `${formatPrice(item.price)} / ${item.unit}`}
                     </p>
                   </div>
                   <button
@@ -74,8 +81,8 @@ export default function CartSidebar({
                 <div className="mt-2 flex items-center justify-between gap-2">
                   <input
                     type="number"
-                    min={item.unit === "kg" ? 0.5 : 1}
-                    step={item.unit === "kg" ? 0.5 : 1}
+                    min={item.pieceMode ? 1 : item.unit === "kg" ? 0.5 : 1}
+                    step={item.pieceMode ? 1 : item.unit === "kg" ? 0.5 : 1}
                     value={item.qty}
                     onChange={(e) => updateQty(item.lineId, Number(e.target.value))}
                     className="w-16 rounded-lg border border-line px-2 py-1 text-sm"

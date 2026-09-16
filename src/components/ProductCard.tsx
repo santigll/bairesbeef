@@ -62,6 +62,11 @@ export default function ProductCard({ product }: { product: ProductWithVariants 
             {formatPrice(product.price)}
           </span>
           <span className="text-sm text-ink/50">/ {product.unit}</span>
+          {product.unit === "unidad" && product.approxWeightKg && (
+            <span className="text-sm text-ink/40">
+              (≈{product.approxWeightKg}kg)
+            </span>
+          )}
         </div>
 
         <button

@@ -11,6 +11,7 @@ export const PRODUCT_CSV_HEADERS = [
   "activo",
   "destacado",
   "coccion",
+  "peso_aprox_kg",
 ] as const;
 
 export function productsToCsv(products: Product[], categories: Category[]): string {
@@ -25,6 +26,7 @@ export function productsToCsv(products: Product[], categories: Category[]): stri
     activo: p.active ? "si" : "no",
     destacado: p.featured ? "si" : "no",
     coccion: p.cookingMethods.join(", "),
+    peso_aprox_kg: p.approxWeightKg ?? "",
   }));
   return Papa.unparse({ fields: [...PRODUCT_CSV_HEADERS], data: rows });
 }

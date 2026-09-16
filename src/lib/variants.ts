@@ -6,26 +6,41 @@ export type ResolvedVariantOption = {
   note?: string;
 };
 
-export type ProductWithVariants = Product & {
-  variantOptions: ResolvedVariantOption[];
+export type ResolvedVariantSlot = {
+  groupId: string;
+  groupName: string;
+  options: ResolvedVariantOption[];
 };
 
-export function resolveProductVariantOptions(
+export type ProductWithVariants = Product & {
+  variantSlots: ResolvedVariantSlot[];
+};
+
+export function resolveProductVariantSlots(
   product: Product,
   groups: VariantGroup[]
-): ResolvedVariantOption[] {
-  if (!product.variantGroupId || !product.variantOptionKeys?.length) return [];
-  const group = groups.find((g) => g.id === product.variantGroupId);
-  if (!group) return [];
+): ResolvedVariantSlot[] {
+  const slots: ResolvedVariantSlot[] = [];
 
-  const enabledSet = new Set(product.variantOptionKeys);
-  return group.options
-    .filter((o) => enabledSet.has(o.key))
-    .map((o) => ({
-      key: o.key,
-      label: o.label,
-      note: product.optionNotes?.[o.key],
-    }));
+  for (const selection of product.variantSelections ?? []) {
+    if (!selection.optionKeys.length) continue;
+    const group = groups.find((g) => g.id === selection.groupId);
+    if (!group) continue;
+
+    const enabledSet = new Set(selection.optionKeys);
+    const options = group.options
+      .filter((o) => enabledSet.has(o.key))
+      .map((o) => ({
+        key: o.key,
+        label: o.label,
+        note: selection.optionNotes?.[o.key],
+      }));
+    if (options.length === 0) continue;
+
+    slots.push({ groupId: group.id, groupName: group.name, options });
+  }
+
+  return slots;
 }
 
 export function withResolvedVariants(
@@ -34,6 +49,6 @@ export function withResolvedVariants(
 ): ProductWithVariants[] {
   return products.map((p) => ({
     ...p,
-    variantOptions: resolveProductVariantOptions(p, groups),
+    variantSlots: resolveProductVariantSlots(p, groups),
   }));
 }

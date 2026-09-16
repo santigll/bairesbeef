@@ -19,10 +19,21 @@ export type CartItem = {
   qty: number;
   variantKey?: string;
   variantLabel?: string;
+  // "Pieza entera": qty counts whole pieces instead of kg, and price is
+  // already the calculated total for one piece (price per kg * approx
+  // kg per piece). pieceApproxKg is kept for display/WhatsApp wording.
+  pieceMode?: boolean;
+  pieceApproxKg?: number;
 };
 
-export function makeLineId(productId: string, variantKey?: string): string {
-  return variantKey ? `${productId}::${variantKey}` : productId;
+export function makeLineId(
+  productId: string,
+  variantKey?: string,
+  pieceMode?: boolean
+): string {
+  return [productId, variantKey, pieceMode ? "pieza" : undefined]
+    .filter(Boolean)
+    .join("::");
 }
 
 const STORAGE_KEY = "bb_cart_v2";
@@ -92,7 +103,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addItem = useCallback(
     (item: Omit<CartItem, "qty" | "lineId">, qty: number) => {
-      const lineId = makeLineId(item.productId, item.variantKey);
+      const lineId = makeLineId(item.productId, item.variantKey, item.pieceMode);
       setCart((prev) => {
         const existing = prev.find((i) => i.lineId === lineId);
         if (existing) {

@@ -40,7 +40,10 @@ export async function deleteGroup(formData: FormData) {
   const id = String(formData.get("id") || "");
   const [groups, products] = await Promise.all([getVariantGroups(), getProducts()]);
 
-  if (products.some((p) => p.variantGroupId === id)) {
+  const inUse = products.some((p) =>
+    p.variantSelections?.some((sel) => sel.groupId === id)
+  );
+  if (inUse) {
     return; // guarded in the UI: only offered when unused
   }
 
@@ -80,19 +83,26 @@ export async function removeOption(formData: FormData) {
   if (!group) return;
   group.options = group.options.filter((o) => o.key !== key);
 
-  // Cascade: drop the removed option from any product that had it enabled,
-  // so nothing references a key that no longer exists in the group.
+  // Cascade: drop the removed option from any product's matching variant
+  // slot, so nothing references a key that no longer exists in the group.
   let productsChanged = false;
   const updatedProducts = products.map((p) => {
-    if (p.variantGroupId !== groupId) return p;
-    if (!p.variantOptionKeys?.includes(key) && !p.optionNotes?.[key]) return p;
+    if (!p.variantSelections?.some((sel) => sel.groupId === groupId && sel.optionKeys.includes(key))) {
+      return p;
+    }
     productsChanged = true;
-    const optionNotes = { ...p.optionNotes };
-    delete optionNotes[key];
     return {
       ...p,
-      variantOptionKeys: p.variantOptionKeys?.filter((k) => k !== key),
-      optionNotes,
+      variantSelections: p.variantSelections.map((sel) => {
+        if (sel.groupId !== groupId) return sel;
+        const optionNotes = { ...sel.optionNotes };
+        delete optionNotes[key];
+        return {
+          ...sel,
+          optionKeys: sel.optionKeys.filter((k) => k !== key),
+          optionNotes,
+        };
+      }),
     };
   });
 

@@ -120,6 +120,14 @@ export async function importProducts(
     const cookingMethods = parseCookingMethods(
       pick(row, ["coccion", "cocción", "cooking"])
     );
+    const pesoAproxRaw = pick(row, ["peso_aprox_kg", "peso aprox", "peso", "kg aprox"]).replace(
+      ",",
+      "."
+    );
+    const approxWeightKg =
+      pesoAproxRaw && Number.isFinite(Number(pesoAproxRaw)) && Number(pesoAproxRaw) > 0
+        ? Number(pesoAproxRaw)
+        : undefined;
 
     const existingIndex = codigo ? products.findIndex((p) => p.code === codigo) : -1;
 
@@ -135,6 +143,7 @@ export async function importProducts(
         active,
         featured,
         cookingMethods,
+        approxWeightKg: approxWeightKg ?? existing.approxWeightKg,
       };
       touchedCodes.add(existing.code);
       updated += 1;
@@ -156,6 +165,7 @@ export async function importProducts(
         featured,
         order,
         cookingMethods,
+        approxWeightKg,
       };
       products.push(newProduct);
       touchedCodes.add(newProduct.code);
