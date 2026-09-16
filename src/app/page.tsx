@@ -1,15 +1,20 @@
 import Link from "next/link";
-import Image from "next/image";
-import { getActiveProducts, getCategories, getSettings, getVariantGroups } from "@/lib/data";
+import {
+  getActiveBanners,
+  getActiveProducts,
+  getCategories,
+  getVariantGroups,
+} from "@/lib/data";
 import { withResolvedVariants } from "@/lib/variants";
 import ProductCard from "@/components/ProductCard";
+import PromoBanner from "@/components/PromoBanner";
 
 export default async function Home() {
-  const [products, categories, settings, groups] = await Promise.all([
+  const [products, categories, groups, banners] = await Promise.all([
     getActiveProducts(),
     getCategories(),
-    getSettings(),
     getVariantGroups(),
+    getActiveBanners(),
   ]);
 
   const featured = withResolvedVariants(products, groups)
@@ -18,7 +23,7 @@ export default async function Home() {
 
   return (
     <div>
-      <Hero storeName={settings.storeName} logoUrl={settings.logoUrl} />
+      <PromoBanner banners={banners} />
 
       <section className="container-page py-14">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
@@ -55,56 +60,6 @@ export default async function Home() {
 
       <TrustStrip />
     </div>
-  );
-}
-
-function Hero({ storeName, logoUrl }: { storeName: string; logoUrl: string }) {
-  return (
-    <section className="relative overflow-hidden bg-ink text-paper">
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.08]"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(45deg, #FAF6F0 0, #FAF6F0 1px, transparent 1px, transparent 22px)",
-        }}
-      />
-      <div className="container-page relative flex flex-col items-center gap-8 py-20 text-center sm:py-28">
-        <Image
-          src={logoUrl || "/logo.svg"}
-          alt={storeName}
-          width={112}
-          height={112}
-          className="rounded-2xl shadow-xl"
-          priority
-        />
-        <div>
-          <p className="font-display text-lg tracking-[0.3em] text-flag">
-            FRIGORÍFICO
-          </p>
-          <h1 className="font-display text-5xl leading-none tracking-wide sm:text-7xl">
-            {storeName}
-          </h1>
-          <p className="mx-auto mt-4 max-w-xl text-paper/70 sm:text-lg">
-            Carne argentina de primera calidad. Cortes seleccionados para tu
-            parrilla y precios especiales para tu negocio.
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center justify-center gap-4">
-          <Link
-            href="/tienda"
-            className="rounded-lg bg-accent px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-paper transition-colors hover:bg-accent-dark"
-          >
-            Comprar minorista
-          </Link>
-          <Link
-            href="/mayorista"
-            className="rounded-lg border border-paper/30 px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-paper transition-colors hover:border-paper"
-          >
-            Soy mayorista
-          </Link>
-        </div>
-      </div>
-    </section>
   );
 }
 

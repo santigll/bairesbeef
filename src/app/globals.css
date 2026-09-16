@@ -43,8 +43,15 @@ body {
   padding-inline: 1.25rem;
 }
 
+.container-wide {
+  max-width: 96rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
 @media (min-width: 768px) {
-  .container-page {
+  .container-page,
+  .container-wide {
     padding-inline: 2rem;
   }
 }

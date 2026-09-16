@@ -8,7 +8,6 @@ import {
 } from "@/lib/data";
 import { withResolvedVariants } from "@/lib/variants";
 import PromoBanner from "@/components/PromoBanner";
-import ProductCard from "@/components/ProductCard";
 import TiendaBrowser from "@/components/TiendaBrowser";
 
 export const metadata: Metadata = {
@@ -31,29 +30,12 @@ export default async function TiendaPage({
   ]);
 
   const withVariants = withResolvedVariants(products, groups);
-  const featured = withVariants.filter((p) => p.featured).slice(0, 6);
 
   return (
     <div>
       <PromoBanner banners={banners} />
 
-      <div className="container-page py-10">
-        {featured.length > 0 && (
-          <section className="mb-12">
-            <p className="font-display text-lg tracking-widest text-accent">
-              DESTACADOS
-            </p>
-            <h1 className="font-display text-3xl tracking-wide text-ink sm:text-4xl">
-              Lo más pedido de la semana
-            </h1>
-            <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-              {featured.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          </section>
-        )}
-
+      <div className="container-wide py-10">
         <TiendaBrowser
           categories={categories}
           products={withVariants}

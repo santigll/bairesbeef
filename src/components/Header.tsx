@@ -8,10 +8,10 @@ import { useCart } from "@/lib/cart-context";
 
 const NAV_LINKS = [
   { href: "/", label: "Inicio" },
-  { href: "/mayorista", label: "Mayorista" },
   { href: "/tienda", label: "Productos" },
   { href: "/nosotros", label: "Nosotros" },
   { href: "/contacto", label: "Contacto" },
+  { href: "/mayorista", label: "Mayorista" },
 ];
 
 export default function Header({
