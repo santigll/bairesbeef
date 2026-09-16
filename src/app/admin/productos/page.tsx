@@ -37,8 +37,12 @@ export default async function AdminProductosPage() {
             Excel o Google Sheets, y volvé a importarlo. Cada fila se
             identifica por su <span className="font-medium">código</span>: si
             el código ya existe se actualiza ese producto, si no existe se
-            crea uno nuevo. Las fotos y las variantes no se manejan por CSV,
-            esas se cargan a mano en cada producto.
+            crea uno nuevo. Si tildás{" "}
+            <span className="font-medium">&quot;Reemplazar catálogo completo&quot;</span>,
+            además se elimina cualquier producto que no esté en el archivo
+            (útil para subir tu planilla maestra entera de una). Las fotos y
+            las variantes no se manejan por CSV, esas se cargan a mano en
+            cada producto.
           </p>
           <div className="mt-4 flex flex-wrap items-center gap-4">
             <a

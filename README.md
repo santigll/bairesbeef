@@ -30,8 +30,11 @@ panel de administración para cambiar precios y fotos de cada corte.
     la carga inicial masiva como para actualizaciones de precios en
     bloque. El importador acepta nombres de columna alternativos
     (`codigo`/`código`/`sku`, `nombre`/`corte`, `categoria`/`especie`,
-    etc.) y si falta la columna `unidad` asume "kg". Fotos y variantes
-    quedan fuera del CSV, esas se cargan a mano por producto.
+    etc.) y si falta la columna `unidad` asume "kg". Con la opción
+    **"Reemplazar catálogo completo"** tildada, además elimina cualquier
+    producto que no esté en el archivo (para subir la planilla maestra
+    entera de una) — pide confirmación antes porque borra. Fotos y
+    variantes quedan fuera del CSV, esas se cargan a mano por producto.
   - **Categorías**: alta/edición/orden/baja.
   - **Variantes**: formas de presentación reutilizables (picado, bifes,
     tiras, marcado, corte especial, composición, etc.), cada una con sus

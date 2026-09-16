@@ -16,6 +16,7 @@ import type { Product, Unit } from "@/lib/types";
 export type ImportResult = {
   created: number;
   updated: number;
+  deleted: number;
   errors: string[];
 };
 
@@ -30,8 +31,9 @@ export async function importProducts(
   formData: FormData
 ): Promise<ImportResult> {
   const file = formData.get("file") as File | null;
+  const replaceAll = formData.get("replaceAll") === "on";
   if (!file || file.size === 0) {
-    return { created: 0, updated: 0, errors: ["No se seleccionó ningún archivo."] };
+    return { created: 0, updated: 0, deleted: 0, errors: ["No se seleccionó ningún archivo."] };
   }
 
   const text = await file.text();
@@ -40,6 +42,7 @@ export async function importProducts(
     return {
       created: 0,
       updated: 0,
+      deleted: 0,
       errors: ["El archivo está vacío o no tiene el formato esperado."],
     };
   }
@@ -59,6 +62,7 @@ export async function importProducts(
   let created = 0;
   let updated = 0;
   const errors: string[] = [];
+  const touchedCodes = new Set<string>();
 
   rows.forEach((row, i) => {
     const line = i + 2; // header is line 1
@@ -128,6 +132,7 @@ export async function importProducts(
         active,
         featured,
       };
+      touchedCodes.add(existing.code);
       updated += 1;
     } else {
       const order = (nextOrderByCategory.get(categoryId) ?? 0) + 1;
@@ -148,12 +153,23 @@ export async function importProducts(
         order,
       };
       products.push(newProduct);
+      touchedCodes.add(newProduct.code);
       created += 1;
     }
   });
 
+  // "Reemplazar todo": drop every existing product whose code this import
+  // didn't touch, so the file becomes the full catalog instead of a patch.
+  let finalProducts = products;
+  let deleted = 0;
+  if (replaceAll) {
+    const before = finalProducts.length;
+    finalProducts = finalProducts.filter((p) => touchedCodes.has(p.code));
+    deleted = before - finalProducts.length;
+  }
+
   await Promise.all([
-    saveProducts(products),
+    saveProducts(finalProducts),
     categoriesChanged ? saveCategories(categories) : Promise.resolve(),
   ]);
 
@@ -162,5 +178,5 @@ export async function importProducts(
   revalidatePath("/");
   revalidatePath("/tienda");
 
-  return { created, updated, errors };
+  return { created, updated, deleted, errors };
 }
