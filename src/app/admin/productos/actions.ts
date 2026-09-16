@@ -5,6 +5,7 @@ import {
   generateId,
   getCategories,
   getProducts,
+  getVariantGroups,
   saveProducts,
   slugify,
 } from "@/lib/data";
@@ -15,6 +16,37 @@ function revalidatePublicPages() {
   revalidatePath("/admin/productos");
   revalidatePath("/");
   revalidatePath("/tienda");
+}
+
+async function parseVariantFields(formData: FormData): Promise<{
+  variantGroupId?: string;
+  variantOptionKeys?: string[];
+  optionNotes?: Record<string, string>;
+}> {
+  const variantGroupId = String(formData.get("variantGroupId") || "");
+  if (!variantGroupId) {
+    return { variantGroupId: undefined, variantOptionKeys: undefined, optionNotes: undefined };
+  }
+
+  const groups = await getVariantGroups();
+  const group = groups.find((g) => g.id === variantGroupId);
+  if (!group) {
+    throw new Error("Variante no encontrada.");
+  }
+
+  const validKeys = new Set(group.options.map((o) => o.key));
+  const variantOptionKeys = formData
+    .getAll("variantOptionKeys")
+    .map(String)
+    .filter((key) => validKeys.has(key));
+
+  const optionNotes: Record<string, string> = {};
+  for (const key of variantOptionKeys) {
+    const note = String(formData.get(`optionNote_${key}`) || "").trim();
+    if (note) optionNotes[key] = note;
+  }
+
+  return { variantGroupId, variantOptionKeys, optionNotes };
 }
 
 async function uniqueSlug(base: string, products: Product[], ignoreId?: string) {
@@ -51,6 +83,7 @@ export async function upsertProduct(formData: FormData) {
 
   const products = await getProducts();
   const uploadedUrl = await saveUploadedImage(imageFile);
+  const variantFields = await parseVariantFields(formData);
 
   if (id) {
     const index = products.findIndex((p) => p.id === id);
@@ -66,6 +99,7 @@ export async function upsertProduct(formData: FormData) {
       active,
       featured,
       imageUrl: uploadedUrl ?? (removeImage ? "" : existing.imageUrl),
+      ...variantFields,
     };
   } else {
     const slug = await uniqueSlug(slugify(name), products);
@@ -84,6 +118,7 @@ export async function upsertProduct(formData: FormData) {
       active,
       featured,
       order: maxOrder + 1,
+      ...variantFields,
     };
     products.push(newProduct);
   }

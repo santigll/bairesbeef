@@ -1,0 +1,82 @@
+[
+  {
+    "id": "vg-picado",
+    "name": "Picado",
+    "order": 1,
+    "options": [
+      { "key": "sin-picar", "label": "Sin picar" },
+      { "key": "picado-1", "label": "Picado 1 vez" },
+      { "key": "picado-2", "label": "Picado 2 veces" }
+    ]
+  },
+  {
+    "id": "vg-bifes",
+    "name": "Bifes",
+    "order": 2,
+    "options": [
+      { "key": "sin-cortar", "label": "Sin cortar" },
+      { "key": "bifes-2cm", "label": "Bifes de 2cm" },
+      { "key": "bifes-4cm", "label": "Bifes de 4cm" },
+      { "key": "bifes-6cm", "label": "Bifes de 6cm" },
+      { "key": "bifes-8cm", "label": "Bifes de 8cm" }
+    ]
+  },
+  {
+    "id": "vg-tiras-finas",
+    "name": "Tiras (corte fino)",
+    "order": 3,
+    "options": [
+      { "key": "sin-cortar", "label": "Sin cortar" },
+      { "key": "tiras-2cm", "label": "Tiras de 2cm" },
+      { "key": "tiras-4cm", "label": "Tiras de 4cm" },
+      { "key": "tiras-6cm", "label": "Tiras de 6cm" }
+    ]
+  },
+  {
+    "id": "vg-tiras-asado",
+    "name": "Tiras (asado)",
+    "order": 4,
+    "options": [
+      { "key": "tiras-2cm", "label": "Tiras de 2cm" },
+      { "key": "tiras-4cm", "label": "Tiras de 4cm" },
+      { "key": "tiras-6cm", "label": "Tiras de 6cm" },
+      { "key": "tiras-8cm", "label": "Tiras de 8cm" },
+      { "key": "tiras-10cm", "label": "Tiras de 10cm" }
+    ]
+  },
+  {
+    "id": "vg-marcado",
+    "name": "Marcado",
+    "order": 5,
+    "options": [
+      { "key": "sin-marcar", "label": "Sin marcar" },
+      { "key": "1-marca", "label": "1 marca" },
+      { "key": "2-marcas", "label": "2 marcas" },
+      { "key": "3-marcas", "label": "3 marcas" },
+      { "key": "4-marcas", "label": "4 marcas" },
+      { "key": "5-marcas", "label": "5 marcas" },
+      { "key": "6-marcas", "label": "6 marcas" }
+    ]
+  },
+  {
+    "id": "vg-corte-especial",
+    "name": "Corte especial",
+    "order": 6,
+    "options": [
+      { "key": "sin-cortar", "label": "Sin cortar" },
+      { "key": "corte-rana", "label": "Corte rana (parrillero)" },
+      { "key": "corte-vertical", "label": "Corte vertical (a la mitad)" },
+      { "key": "trozado-4", "label": "Trozado en 4" },
+      { "key": "trozado-8", "label": "Trozado en 8" }
+    ]
+  },
+  {
+    "id": "vg-composicion",
+    "name": "Composición",
+    "order": 7,
+    "options": [
+      { "key": "puro-cerdo", "label": "Puro cerdo" },
+      { "key": "mezcla", "label": "Mezcla" }
+    ]
+  }
+]

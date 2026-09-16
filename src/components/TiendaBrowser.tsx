@@ -1,17 +1,23 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Category, Product } from "@/lib/types";
+import type { Category } from "@/lib/types";
+import type { ProductWithVariants } from "@/lib/variants";
 import ProductCard from "./ProductCard";
+import CartSidebar from "./CartSidebar";
 
 export default function TiendaBrowser({
   categories,
   products,
   initialCategorySlug,
+  whatsapp,
+  minOrderNote,
 }: {
   categories: Category[];
-  products: Product[];
+  products: ProductWithVariants[];
   initialCategorySlug?: string;
+  whatsapp: string;
+  minOrderNote?: string;
 }) {
   const initialCategory =
     categories.find((c) => c.slug === initialCategorySlug)?.id ?? "all";
@@ -26,50 +32,70 @@ export default function TiendaBrowser({
     });
   }, [products, categoryId, search]);
 
+  const activeCategoryName =
+    categoryId === "all" ? "Todos" : categories.find((c) => c.id === categoryId)?.name;
+
   return (
-    <div>
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-wrap gap-2">
-          <FilterChip
+    <div className="grid gap-6 lg:grid-cols-[200px_1fr_320px] lg:items-start">
+      <aside className="lg:sticky lg:top-24">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-ink/50">
+          Filtros
+        </p>
+        <nav className="flex gap-2 overflow-x-auto pb-2 lg:flex-col lg:gap-1 lg:overflow-visible lg:pb-0">
+          <FilterItem
             active={categoryId === "all"}
             label="Todos"
             onClick={() => setCategoryId("all")}
           />
           {categories.map((cat) => (
-            <FilterChip
+            <FilterItem
               key={cat.id}
               active={categoryId === cat.id}
               label={cat.name}
               onClick={() => setCategoryId(cat.id)}
             />
           ))}
+        </nav>
+      </aside>
+
+      <div>
+        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="font-display text-2xl tracking-wide text-ink">
+              {activeCategoryName}
+            </h2>
+            <p className="text-sm text-ink/50">{filtered.length} productos</p>
+          </div>
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar un corte..."
+            className="w-full rounded-lg border border-line bg-white px-4 py-2 text-sm sm:w-64"
+          />
         </div>
 
-        <input
-          type="search"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Buscar un corte..."
-          className="w-full rounded-lg border border-line bg-white px-4 py-2 text-sm sm:w-64"
-        />
+        {filtered.length === 0 ? (
+          <p className="rounded-lg border border-dashed border-line bg-white p-8 text-center text-ink/60">
+            No encontramos cortes que coincidan con tu búsqueda.
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            {filtered.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
       </div>
 
-      {filtered.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-line bg-white p-8 text-center text-ink/60">
-          No encontramos cortes que coincidan con tu búsqueda.
-        </p>
-      ) : (
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filtered.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      )}
+      <aside className="lg:sticky lg:top-24">
+        <CartSidebar whatsapp={whatsapp} minOrderNote={minOrderNote} />
+      </aside>
     </div>
   );
 }
 
-function FilterChip({
+function FilterItem({
   active,
   label,
   onClick,
@@ -82,10 +108,10 @@ function FilterChip({
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+      className={`flex-none rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors lg:flex-auto ${
         active
-          ? "border-ink bg-ink text-paper"
-          : "border-line bg-white text-ink/70 hover:border-ink/40"
+          ? "bg-ink text-paper"
+          : "text-ink/70 hover:bg-white hover:text-ink"
       }`}
     >
       {label}

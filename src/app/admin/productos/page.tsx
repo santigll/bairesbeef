@@ -1,13 +1,16 @@
 import Image from "next/image";
 import AdminShell from "@/components/admin/AdminShell";
-import { getCategories, getProducts } from "@/lib/data";
+import ProductVariantFields from "@/components/admin/ProductVariantFields";
+import { getCategories, getProducts, getVariantGroups } from "@/lib/data";
 import { formatPrice } from "@/lib/whatsapp";
+import type { VariantGroup } from "@/lib/types";
 import { deleteProduct, upsertProduct } from "./actions";
 
 export default async function AdminProductosPage() {
-  const [products, categories] = await Promise.all([
+  const [products, categories, variantGroups] = await Promise.all([
     getProducts(),
     getCategories(),
+    getVariantGroups(),
   ]);
 
   const categoryName = (id: string) =>
@@ -20,7 +23,7 @@ export default async function AdminProductosPage() {
           <h2 className="font-display text-2xl tracking-wide text-ink">
             Nuevo producto
           </h2>
-          <ProductForm categories={categories} />
+          <ProductForm categories={categories} variantGroups={variantGroups} />
         </section>
 
         <section>
@@ -71,7 +74,11 @@ export default async function AdminProductosPage() {
                   </summary>
 
                   <div className="border-t border-line p-4">
-                    <ProductForm categories={categories} product={product} />
+                    <ProductForm
+                      categories={categories}
+                      variantGroups={variantGroups}
+                      product={product}
+                    />
                     <form action={deleteProduct} className="mt-3">
                       <input type="hidden" name="id" value={product.id} />
                       <button
@@ -94,9 +101,11 @@ export default async function AdminProductosPage() {
 
 function ProductForm({
   categories,
+  variantGroups,
   product,
 }: {
   categories: { id: string; name: string }[];
+  variantGroups: VariantGroup[];
   product?: {
     id: string;
     name: string;
@@ -107,6 +116,9 @@ function ProductForm({
     active: boolean;
     featured: boolean;
     imageUrl: string;
+    variantGroupId?: string;
+    variantOptionKeys?: string[];
+    optionNotes?: Record<string, string>;
   };
 }) {
   return (
@@ -202,6 +214,13 @@ function ProductForm({
           </label>
         )}
       </div>
+
+      <ProductVariantFields
+        groups={variantGroups}
+        initialGroupId={product?.variantGroupId}
+        initialOptionKeys={product?.variantOptionKeys}
+        initialNotes={product?.optionNotes}
+      />
 
       <div className="flex items-center gap-6 sm:col-span-2">
         <label className="flex items-center gap-2 text-sm text-ink/70">

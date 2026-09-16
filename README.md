@@ -7,16 +7,29 @@ panel de administración para cambiar precios y fotos de cada corte.
 ## Cómo está organizado
 
 - **`/`** — Home con hero, destacados, categorías y accesos a minorista/mayorista.
-- **`/tienda`** — Catálogo minorista con filtro por categoría, buscador,
-  carrito (persistido en el navegador) y botón **"Finalizar por WhatsApp"**
-  que arma el mensaje con el detalle del pedido y el total.
+- **`/tienda`** ("Productos" en el menú) — Banner de ofertas/comunicaciones
+  arriba de todo, destacados de la semana, y el catálogo completo con filtro
+  de categorías a la izquierda y el carrito fijo al costado (siempre visible
+  mientras navegás, con lo que llevás y el total). Click en una foto o
+  "Ver detalles" abre el producto en grande. Botón **"Finalizar por
+  WhatsApp"** arma el mensaje con el detalle del pedido (incluida la
+  presentación elegida en cada corte) y el total.
 - **`/mayorista`** — Landing mayorista con beneficios y un formulario corto
   (negocio, rubro, detalle) que arma un mensaje y abre WhatsApp directo.
 - **`/nosotros`**, **`/contacto`** — Institucional y datos de contacto.
 - **`/admin`** — Panel protegido con usuario/contraseña para gestionar:
   - **Productos**: alta/edición/baja, precio, unidad (kg o unidad), foto,
-    activo/inactivo, destacado en el home.
+    activo/inactivo, destacado en el home, y variante de presentación
+    (ver abajo).
   - **Categorías**: alta/edición/orden/baja.
+  - **Variantes**: formas de presentación reutilizables (picado, bifes,
+    tiras, marcado, corte especial, composición, etc.), cada una con sus
+    propias opciones. Un producto puede tener asignada una variante y elegir
+    cuáles de sus opciones aplican (no todos los cortes admiten las mismas
+    opciones), con una nota opcional por opción — por ejemplo, el peso
+    aproximado de cada tira de asado.
+  - **Banners**: el carrusel de ofertas/novedades que aparece arriba de todo
+    en Productos.
   - **Configuración**: nombre, logo, números de WhatsApp (minorista y
     mayorista), textos de la sección mayorista, dirección, horarios, email,
     Instagram.

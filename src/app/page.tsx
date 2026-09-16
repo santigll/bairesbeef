@@ -1,16 +1,20 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getActiveProducts, getCategories, getSettings } from "@/lib/data";
+import { getActiveProducts, getCategories, getSettings, getVariantGroups } from "@/lib/data";
+import { withResolvedVariants } from "@/lib/variants";
 import ProductCard from "@/components/ProductCard";
 
 export default async function Home() {
-  const [products, categories, settings] = await Promise.all([
+  const [products, categories, settings, groups] = await Promise.all([
     getActiveProducts(),
     getCategories(),
     getSettings(),
+    getVariantGroups(),
   ]);
 
-  const featured = products.filter((p) => p.featured).slice(0, 8);
+  const featured = withResolvedVariants(products, groups)
+    .filter((p) => p.featured)
+    .slice(0, 8);
 
   return (
     <div>

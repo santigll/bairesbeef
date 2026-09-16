@@ -10,7 +10,15 @@
     "imageUrl": "",
     "active": true,
     "featured": true,
-    "order": 1
+    "order": 1,
+    "variantGroupId": "vg-tiras-asado",
+    "variantOptionKeys": ["tiras-2cm", "tiras-4cm", "tiras-6cm", "tiras-8cm"],
+    "optionNotes": {
+      "tiras-2cm": "~250g c/tira aprox.",
+      "tiras-4cm": "~450g c/tira aprox.",
+      "tiras-6cm": "~650g c/tira aprox.",
+      "tiras-8cm": "~850g c/tira aprox."
+    }
   },
   {
     "id": "p-costillar-cerdo",
@@ -23,7 +31,9 @@
     "imageUrl": "",
     "active": true,
     "featured": true,
-    "order": 1
+    "order": 1,
+    "variantGroupId": "vg-marcado",
+    "variantOptionKeys": ["sin-marcar", "1-marca", "2-marcas", "3-marcas", "4-marcas"]
   },
   {
     "id": "p-pollo-entero",
@@ -49,7 +59,9 @@
     "imageUrl": "",
     "active": true,
     "featured": true,
-    "order": 1
+    "order": 1,
+    "variantGroupId": "vg-composicion",
+    "variantOptionKeys": ["puro-cerdo", "mezcla"]
   },
   {
     "id": "p-mollejas",
@@ -88,7 +100,9 @@
     "imageUrl": "",
     "active": true,
     "featured": true,
-    "order": 2
+    "order": 2,
+    "variantGroupId": "vg-corte-especial",
+    "variantOptionKeys": ["sin-cortar", "corte-rana", "corte-vertical"]
   },
   {
     "id": "p-bondiola",
@@ -244,7 +258,9 @@
     "imageUrl": "",
     "active": true,
     "featured": true,
-    "order": 5
+    "order": 5,
+    "variantGroupId": "vg-bifes",
+    "variantOptionKeys": ["bifes-2cm", "bifes-4cm", "bifes-6cm"]
   },
   {
     "id": "p-lomo",
@@ -283,6 +299,8 @@
     "imageUrl": "",
     "active": true,
     "featured": false,
-    "order": 8
+    "order": 8,
+    "variantGroupId": "vg-picado",
+    "variantOptionKeys": ["sin-picar", "picado-1", "picado-2"]
   }
 ]

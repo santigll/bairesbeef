@@ -1,0 +1,11 @@
+[
+  {
+    "id": "banner-bienvenida",
+    "title": "Bienvenido a Baires Beef",
+    "subtitle": "Cortes seleccionados, precios claros y pedidos directo por WhatsApp.",
+    "imageUrl": "",
+    "linkUrl": "/tienda",
+    "active": true,
+    "order": 1
+  }
+]

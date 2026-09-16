@@ -1,15 +1,19 @@
 import { promises as fs } from "fs";
 import path from "path";
-import type { Category, Product, Settings } from "./types";
+import type { Banner, Category, Product, Settings, VariantGroup } from "./types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const SEED_DIR = path.join(process.cwd(), "data-seed");
 const PRODUCTS_FILE = path.join(DATA_DIR, "products.json");
 const CATEGORIES_FILE = path.join(DATA_DIR, "categories.json");
 const SETTINGS_FILE = path.join(DATA_DIR, "settings.json");
+const VARIANT_GROUPS_FILE = path.join(DATA_DIR, "variant-groups.json");
+const BANNERS_FILE = path.join(DATA_DIR, "banners.json");
 const PRODUCTS_SEED = path.join(SEED_DIR, "products.json");
 const CATEGORIES_SEED = path.join(SEED_DIR, "categories.json");
 const SETTINGS_SEED = path.join(SEED_DIR, "settings.json");
+const VARIANT_GROUPS_SEED = path.join(SEED_DIR, "variant-groups.json");
+const BANNERS_SEED = path.join(SEED_DIR, "banners.json");
 
 // Simple in-process write queue so concurrent admin edits don't clobber
 // each other when read-modify-write races on the same JSON file.
@@ -86,6 +90,29 @@ export async function getSettings(): Promise<Settings> {
 
 export async function saveSettings(settings: Settings): Promise<void> {
   return enqueue(() => writeJson(SETTINGS_FILE, settings));
+}
+
+export async function getVariantGroups(): Promise<VariantGroup[]> {
+  const groups = await readJson<VariantGroup[]>(VARIANT_GROUPS_FILE, VARIANT_GROUPS_SEED);
+  return groups.sort((a, b) => a.order - b.order);
+}
+
+export async function saveVariantGroups(groups: VariantGroup[]): Promise<void> {
+  return enqueue(() => writeJson(VARIANT_GROUPS_FILE, groups));
+}
+
+export async function getBanners(): Promise<Banner[]> {
+  const banners = await readJson<Banner[]>(BANNERS_FILE, BANNERS_SEED);
+  return banners.sort((a, b) => a.order - b.order);
+}
+
+export async function getActiveBanners(): Promise<Banner[]> {
+  const banners = await getBanners();
+  return banners.filter((b) => b.active);
+}
+
+export async function saveBanners(banners: Banner[]): Promise<void> {
+  return enqueue(() => writeJson(BANNERS_FILE, banners));
 }
 
 export function slugify(input: string): string {

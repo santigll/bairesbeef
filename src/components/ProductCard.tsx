@@ -2,39 +2,21 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import type { Product } from "@/lib/types";
+import type { ProductWithVariants } from "@/lib/variants";
 import { formatPrice } from "@/lib/whatsapp";
-import { useCart } from "@/lib/cart-context";
+import AddToCartForm from "./AddToCartForm";
+import ProductModal from "./ProductModal";
 
-const STEP: Record<Product["unit"], number> = { kg: 0.5, unidad: 1 };
-const MIN: Record<Product["unit"], number> = { kg: 0.5, unidad: 1 };
-
-export default function ProductCard({ product }: { product: Product }) {
-  const { addItem } = useCart();
-  const [qty, setQty] = useState(MIN[product.unit]);
-  const [added, setAdded] = useState(false);
-
-  const step = STEP[product.unit];
-  const min = MIN[product.unit];
-
-  function handleAdd() {
-    addItem(
-      {
-        productId: product.id,
-        slug: product.slug,
-        name: product.name,
-        unit: product.unit,
-        price: product.price,
-      },
-      qty
-    );
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1500);
-  }
+export default function ProductCard({ product }: { product: ProductWithVariants }) {
+  const [open, setOpen] = useState(false);
 
   return (
     <div className="group flex flex-col overflow-hidden rounded-xl border border-line bg-white shadow-sm transition-shadow hover:shadow-md">
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-paper-alt">
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="relative aspect-[4/3] w-full overflow-hidden bg-paper-alt text-left"
+      >
         {product.imageUrl ? (
           <Image
             src={product.imageUrl}
@@ -46,58 +28,43 @@ export default function ProductCard({ product }: { product: Product }) {
         ) : (
           <PlaceholderArt />
         )}
-      </div>
+      </button>
 
       <div className="flex flex-1 flex-col p-4">
-        <h3 className="font-display text-xl tracking-wide text-ink">
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="text-left font-display text-xl tracking-wide text-ink hover:text-accent"
+        >
           {product.name}
-        </h3>
+        </button>
         {product.description && (
           <p className="mt-1 line-clamp-2 text-sm text-ink/60">
             {product.description}
           </p>
         )}
 
-        <div className="mt-3 flex items-baseline gap-1">
+        <div className="mt-2 flex items-baseline gap-1">
           <span className="text-lg font-bold text-accent">
             {formatPrice(product.price)}
           </span>
           <span className="text-sm text-ink/50">/ {product.unit}</span>
         </div>
 
-        <div className="mt-4 flex items-center gap-2">
-          <div className="flex items-center rounded-lg border border-line">
-            <button
-              type="button"
-              aria-label="Restar"
-              className="px-2.5 py-1.5 text-ink/70 hover:text-ink"
-              onClick={() => setQty((q) => Math.max(min, Number((q - step).toFixed(2))))}
-            >
-              −
-            </button>
-            <span className="min-w-[2.5rem] text-center text-sm font-medium">
-              {qty} {product.unit === "kg" ? "kg" : "u."}
-            </span>
-            <button
-              type="button"
-              aria-label="Sumar"
-              className="px-2.5 py-1.5 text-ink/70 hover:text-ink"
-              onClick={() => setQty((q) => Number((q + step).toFixed(2)))}
-            >
-              +
-            </button>
-          </div>
-          <button
-            type="button"
-            onClick={handleAdd}
-            className={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold text-paper transition-colors ${
-              added ? "bg-flag-dark" : "bg-ink hover:bg-accent"
-            }`}
-          >
-            {added ? "Agregado ✓" : "Agregar"}
-          </button>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="mt-1 self-start text-xs font-medium text-ink/50 underline decoration-line underline-offset-2 hover:text-accent"
+        >
+          Ver detalles
+        </button>
+
+        <div className="mt-3">
+          <AddToCartForm product={product} compact />
         </div>
       </div>
+
+      {open && <ProductModal product={product} onClose={() => setOpen(false)} />}
     </div>
   );
 }

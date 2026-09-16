@@ -10,15 +10,22 @@ import {
 import type { Unit } from "./types";
 
 export type CartItem = {
+  lineId: string;
   productId: string;
   slug: string;
   name: string;
   unit: Unit;
   price: number;
   qty: number;
+  variantKey?: string;
+  variantLabel?: string;
 };
 
-const STORAGE_KEY = "bb_cart_v1";
+export function makeLineId(productId: string, variantKey?: string): string {
+  return variantKey ? `${productId}::${variantKey}` : productId;
+}
+
+const STORAGE_KEY = "bb_cart_v2";
 const EMPTY_CART: CartItem[] = [];
 
 function loadFromStorage(): CartItem[] {
@@ -67,9 +74,12 @@ function getServerSnapshot() {
 
 type CartContextValue = {
   items: CartItem[];
-  addItem: (item: Omit<CartItem, "qty">, qty: number) => void;
-  updateQty: (productId: string, qty: number) => void;
-  removeItem: (productId: string) => void;
+  addItem: (
+    item: Omit<CartItem, "qty" | "lineId">,
+    qty: number
+  ) => void;
+  updateQty: (lineId: string, qty: number) => void;
+  removeItem: (lineId: string) => void;
   clear: () => void;
   totalCount: number;
   totalPrice: number;
@@ -80,28 +90,32 @@ const CartContext = createContext<CartContextValue | null>(null);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const items = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-  const addItem = useCallback((item: Omit<CartItem, "qty">, qty: number) => {
-    setCart((prev) => {
-      const existing = prev.find((i) => i.productId === item.productId);
-      if (existing) {
-        return prev.map((i) =>
-          i.productId === item.productId ? { ...i, qty: i.qty + qty } : i
-        );
-      }
-      return [...prev, { ...item, qty }];
-    });
-  }, []);
+  const addItem = useCallback(
+    (item: Omit<CartItem, "qty" | "lineId">, qty: number) => {
+      const lineId = makeLineId(item.productId, item.variantKey);
+      setCart((prev) => {
+        const existing = prev.find((i) => i.lineId === lineId);
+        if (existing) {
+          return prev.map((i) =>
+            i.lineId === lineId ? { ...i, qty: i.qty + qty } : i
+          );
+        }
+        return [...prev, { ...item, lineId, qty }];
+      });
+    },
+    []
+  );
 
-  const updateQty = useCallback((productId: string, qty: number) => {
+  const updateQty = useCallback((lineId: string, qty: number) => {
     setCart((prev) =>
       qty <= 0
-        ? prev.filter((i) => i.productId !== productId)
-        : prev.map((i) => (i.productId === productId ? { ...i, qty } : i))
+        ? prev.filter((i) => i.lineId !== lineId)
+        : prev.map((i) => (i.lineId === lineId ? { ...i, qty } : i))
     );
   }, []);
 
-  const removeItem = useCallback((productId: string) => {
-    setCart((prev) => prev.filter((i) => i.productId !== productId));
+  const removeItem = useCallback((lineId: string) => {
+    setCart((prev) => prev.filter((i) => i.lineId !== lineId));
   }, []);
 
   const clear = useCallback(() => setCart(() => []), []);
