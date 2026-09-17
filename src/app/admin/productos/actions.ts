@@ -75,7 +75,10 @@ async function parseVariantFields(
   return { variantSelections: selections };
 }
 
-function parsePieceFormatFields(formData: FormData): {
+function parsePieceFormatFields(
+  formData: FormData,
+  unit: Unit
+): {
   pieceFormats: PieceFormat[];
   offerLoose: boolean;
 } {
@@ -92,12 +95,27 @@ function parsePieceFormatFields(formData: FormData): {
       throw new Error(`El formato "${label}" necesita un peso aproximado mayor a 0.`);
     }
 
-    pieceFormats.push({ id: `pf-${i}-${slugify(label)}`, label, approxKg });
+    const priceRaw = String(formData.get(`pieceFormatPrice_${i}`) || "").trim();
+    let price: number | undefined;
+    if (priceRaw) {
+      price = Number(priceRaw);
+      if (!Number.isFinite(price) || price <= 0) {
+        throw new Error(`El precio del formato "${label}" tiene que ser mayor a 0.`);
+      }
+    } else if (unit === "unidad") {
+      // No per-kg rate to derive a price from when the product itself is
+      // priced flat "por unidad" — each format needs its own price.
+      throw new Error(
+        `El formato "${label}" necesita un precio (el producto es por unidad, no hay un precio/kg del que calcularlo).`
+      );
+    }
+
+    pieceFormats.push({ id: `pf-${i}-${slugify(label)}`, label, approxKg, price });
   }
 
   if (!offerLoose && pieceFormats.length === 0) {
     throw new Error(
-      'Si desmarcás "Vender también suelto por kg" tenés que cargar al menos un formato (ej: "Bolsa de 1kg").'
+      'Si desmarcás "Vender también sin formato fijo" tenés que cargar al menos un formato (ej: "Bolsa de 1kg").'
     );
   }
 
@@ -139,7 +157,7 @@ export async function upsertProduct(
     const uploadedUrl = await saveUploadedImage(imageFile);
     const variantFields = await parseVariantFields(formData);
     const cookingMethods = parseCookingMethodsField(formData);
-    const { pieceFormats, offerLoose } = parsePieceFormatFields(formData);
+    const { pieceFormats, offerLoose } = parsePieceFormatFields(formData, unit);
 
     if (id) {
       const index = products.findIndex((p) => p.id === id);

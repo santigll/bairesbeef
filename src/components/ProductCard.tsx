@@ -57,7 +57,7 @@ export default function ProductCard({ product }: { product: ProductWithVariants 
           </div>
         )}
 
-        {product.unit === "kg" && (product.pieceFormats?.length ?? 0) > 0 && (
+        {(product.pieceFormats?.length ?? 0) > 0 && (
           <div className="mt-2 flex flex-wrap gap-1">
             {product.offerLoose === false ? (
               <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">

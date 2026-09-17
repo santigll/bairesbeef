@@ -9,7 +9,7 @@ import type { Unit } from "@/lib/types";
 const STEP: Record<Unit, number> = { kg: 0.5, unidad: 1 };
 const MIN: Record<Unit, number> = { kg: 0.5, unidad: 1 };
 
-type Mode = { id: string; label: string; approxKg?: number };
+type Mode = { id: string; label: string; approxKg?: number; price?: number };
 
 export default function AddToCartForm({
   product,
@@ -20,17 +20,19 @@ export default function AddToCartForm({
 }) {
   const { addItem } = useCart();
 
-  const pieceFormats = product.unit === "kg" ? product.pieceFormats ?? [] : [];
-  const showLoose = product.unit === "kg" && (product.offerLoose !== false || pieceFormats.length === 0);
+  const pieceFormats = product.pieceFormats ?? [];
+  const baseModeLabel = product.unit === "kg" ? "Por kg" : "Unidad";
+  const showBaseMode = product.offerLoose !== false || pieceFormats.length === 0;
   const modes: Mode[] = [
-    ...(showLoose ? [{ id: "loose", label: "Por kg" }] : []),
-    ...pieceFormats.map((f) => ({ id: f.id, label: f.label, approxKg: f.approxKg })),
+    ...(showBaseMode ? [{ id: "base", label: baseModeLabel }] : []),
+    ...pieceFormats.map((f) => ({ id: f.id, label: f.label, approxKg: f.approxKg, price: f.price })),
   ];
   const hasModeChoice = modes.length > 1;
 
-  const [modeId, setModeId] = useState(modes[0]?.id ?? "loose");
+  const [modeId, setModeId] = useState(modes[0]?.id ?? "base");
   const selectedMode = modes.find((m) => m.id === modeId) ?? modes[0];
-  const isFixedFormat = !!selectedMode && selectedMode.id !== "loose";
+  const isFixedFormat = !!selectedMode && selectedMode.id !== "base";
+  const isLooseKg = !isFixedFormat && product.unit === "kg";
 
   const [selections, setSelections] = useState<Record<string, string>>(() =>
     Object.fromEntries(
@@ -39,22 +41,36 @@ export default function AddToCartForm({
         .map((slot) => [slot.groupId, slot.options[0].key])
     )
   );
-  const [qty, setQty] = useState(isFixedFormat ? 1 : MIN[product.unit]);
+  const [qty, setQty] = useState(isLooseKg ? MIN[product.unit] : 1);
   const [added, setAdded] = useState(false);
 
-  const step = isFixedFormat ? 1 : STEP[product.unit];
-  const min = isFixedFormat ? 1 : MIN[product.unit];
-  const unitLabel = isFixedFormat ? "u." : product.unit === "kg" ? "kg" : "u.";
+  const step = isLooseKg ? STEP[product.unit] : 1;
+  const min = isLooseKg ? MIN[product.unit] : 1;
 
-  const effectivePrice =
-    isFixedFormat && selectedMode?.approxKg
-      ? Math.round(product.price * selectedMode.approxKg)
-      : product.price;
+  const effectivePrice = isFixedFormat
+    ? (selectedMode?.price ?? Math.round(product.price * (selectedMode?.approxKg ?? 0)))
+    : product.price;
+
+  // Weight represented by ONE of whatever is currently selected, used to
+  // show a running kg total as the quantity goes up (e.g. 2,2kg, 4,4kg)
+  // instead of a plain "1 u., 2 u." count — for a fixed format that's its
+  // own approx weight; for a plain "por unidad" purchase (no format) it's
+  // the product's informational approxWeightKg, if set.
+  const weightPerUnit = isFixedFormat
+    ? selectedMode?.approxKg
+    : product.unit === "unidad"
+      ? product.approxWeightKg
+      : undefined;
+  const showWeightDisplay = !!weightPerUnit && weightPerUnit > 0;
+  const showTotal = isFixedFormat || showWeightDisplay;
+
+  const displayQty = showWeightDisplay ? Number((qty * weightPerUnit!).toFixed(2)) : qty;
+  const displayUnit = showWeightDisplay || isLooseKg ? "kg" : "u.";
 
   function changeMode(next: string) {
     setModeId(next);
-    const nextIsFixed = modes.find((m) => m.id === next)?.id !== "loose";
-    setQty(nextIsFixed ? 1 : MIN[product.unit]);
+    const nextIsLooseKg = modes.find((m) => m.id === next)?.id === "base" && product.unit === "kg";
+    setQty(nextIsLooseKg ? MIN[product.unit] : 1);
   }
 
   function handleAdd() {
@@ -138,10 +154,13 @@ export default function AddToCartForm({
         </div>
       )}
 
-      {isFixedFormat && selectedMode?.approxKg && (
+      {isFixedFormat && selectedMode && (
         <p className="text-xs text-ink/50">
-          {formatPrice(product.price)}/kg × ≈{selectedMode.approxKg}kg ≈{" "}
-          {formatPrice(effectivePrice)} por {selectedMode.label.toLowerCase()}
+          {product.unit === "kg" && selectedMode.price == null && selectedMode.approxKg
+            ? `${formatPrice(product.price)}/kg × ≈${selectedMode.approxKg}kg ≈ ${formatPrice(effectivePrice)} por ${selectedMode.label.toLowerCase()}`
+            : `${formatPrice(effectivePrice)} por ${selectedMode.label.toLowerCase()}${
+                selectedMode.approxKg ? ` (≈${selectedMode.approxKg}kg)` : ""
+              }`}
         </p>
       )}
 
@@ -156,7 +175,7 @@ export default function AddToCartForm({
             −
           </button>
           <span className="min-w-[3.5rem] text-center text-sm font-medium">
-            {qty} {unitLabel}
+            {displayQty} {displayUnit}
           </span>
           <button
             type="button"
@@ -178,7 +197,7 @@ export default function AddToCartForm({
         </button>
       </div>
 
-      {isFixedFormat && (
+      {showTotal && (
         <p className="text-right text-sm font-semibold text-ink">
           Total: {formatPrice(effectivePrice * qty)}
         </p>

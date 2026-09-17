@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import ProductVariantFields from "@/components/admin/ProductVariantFields";
 import PieceFormatFields from "@/components/admin/PieceFormatFields";
 import { upsertProduct, type ProductFormState } from "@/app/admin/productos/actions";
@@ -8,6 +8,7 @@ import {
   COOKING_METHODS,
   type PieceFormat,
   type ProductVariantSelection,
+  type Unit,
   type VariantGroup,
 } from "@/lib/types";
 
@@ -41,6 +42,7 @@ export default function ProductForm({
   product?: AdminProduct;
 }) {
   const [state, formAction, pending] = useActionState(upsertProduct, initialState);
+  const [unit, setUnit] = useState<Unit>((product?.unit as Unit) ?? "kg");
 
   return (
     <form action={formAction} className="grid gap-4 sm:grid-cols-2">
@@ -111,7 +113,8 @@ export default function ProductForm({
         </label>
         <select
           name="unit"
-          defaultValue={product?.unit ?? "kg"}
+          value={unit}
+          onChange={(e) => setUnit(e.target.value as Unit)}
           className="w-full rounded-lg border border-line px-3 py-2 text-sm"
         >
           <option value="kg">Por kg</option>
@@ -150,6 +153,7 @@ export default function ProductForm({
       </div>
 
       <PieceFormatFields
+        unit={unit}
         initialFormats={product?.pieceFormats}
         initialOfferLoose={product?.offerLoose}
       />
@@ -172,7 +176,9 @@ export default function ProductForm({
         />
         <p className="mt-1 text-xs text-ink/50">
           Es solo informativo: se muestra como &quot;≈X kg&quot; al lado del
-          precio, sin afectar el cálculo (la unidad ya tiene precio fijo).
+          precio, y en la tienda el contador de cantidad va sumando este
+          peso (ej: 2,2kg, 4,4kg...) en vez de mostrar &quot;1 u., 2 u.&quot;
+          — sin afectar el cálculo, la unidad ya tiene precio fijo.
         </p>
       </div>
 
