@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   description: "Conocé la historia y los valores de Baires Beef.",
 };
 
+// See src/app/page.tsx for why this is needed on every page reading data/*.json.
+export const dynamic = "force-dynamic";
+
 export default async function NosotrosPage() {
   const settings = await getSettings();
 

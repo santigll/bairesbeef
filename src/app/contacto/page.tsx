@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   description: "Escribinos por WhatsApp, mail o visitanos.",
 };
 
+// See src/app/page.tsx for why this is needed on every page reading data/*.json.
+export const dynamic = "force-dynamic";
+
 export default async function ContactoPage() {
   const settings = await getSettings();
   const href = waLink(

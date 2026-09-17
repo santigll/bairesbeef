@@ -4,6 +4,9 @@ import BannerForm from "@/components/admin/BannerForm";
 import { getBanners } from "@/lib/data";
 import { deleteBanner, moveBanner } from "./actions";
 
+// See src/app/page.tsx for why every page reading data/*.json needs this.
+export const dynamic = "force-dynamic";
+
 export default async function AdminBannersPage() {
   const banners = await getBanners();
 

@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   description: "Venta mayorista de carne para restaurantes, parrillas y comercios.",
 };
 
+// See src/app/page.tsx for why this is needed on every page reading data/*.json.
+export const dynamic = "force-dynamic";
+
 export default async function MayoristaPage() {
   const settings = await getSettings();
   const quickHref = waLink(

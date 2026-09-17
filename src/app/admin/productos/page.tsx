@@ -7,6 +7,9 @@ import { formatPrice } from "@/lib/whatsapp";
 import type { VariantGroup } from "@/lib/types";
 import { deleteProduct, moveProduct } from "./actions";
 
+// See src/app/page.tsx for why every page reading data/*.json needs this.
+export const dynamic = "force-dynamic";
+
 export default async function AdminProductosPage() {
   const [products, categories, variantGroups] = await Promise.all([
     getProducts(),

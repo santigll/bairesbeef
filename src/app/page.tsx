@@ -9,6 +9,13 @@ import { withResolvedVariants } from "@/lib/variants";
 import ProductCard from "@/components/ProductCard";
 import PromoBanner from "@/components/PromoBanner";
 
+// This reads data/*.json straight off disk, which changes at runtime
+// (admin edits) independently of anything Next.js can see as a build-time
+// dependency — without this, the page gets statically prerendered once at
+// build time (before the persistent volume's real data even exists) and
+// keeps serving that stale snapshot until something happens to revalidate it.
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const [products, categories, groups, banners] = await Promise.all([
     getActiveProducts(),

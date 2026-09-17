@@ -132,18 +132,7 @@ export async function upsertProduct(
 
     const categories = await getCategories();
     if (!categories.some((c) => c.id === categoryId)) {
-      // Diagnostic detail temporarily included in the message: this
-      // validation has failed for a category that looks valid in the
-      // dropdown, which points to the server's categories.json being out
-      // of sync with what the page rendered (e.g. multiple app instances
-      // each with their own local data/ directory). Seeing the actual
-      // received id vs. what the server currently has helps confirm that
-      // without needing server log access.
-      throw new Error(
-        `Elegí una categoría válida. (recibido: "${categoryId || "(vacío)"}"; categorías del servidor: ${
-          categories.map((c) => `${c.name}=${c.id}`).join(", ") || "(ninguna)"
-        })`
-      );
+      throw new Error("Elegí una categoría válida.");
     }
 
     const products = await getProducts();

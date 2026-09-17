@@ -3,6 +3,9 @@ import AdminShell from "@/components/admin/AdminShell";
 import { getSettings } from "@/lib/data";
 import { updateSettings } from "./actions";
 
+// See src/app/page.tsx for why every page reading data/*.json needs this.
+export const dynamic = "force-dynamic";
+
 export default async function AdminConfiguracionPage() {
   const settings = await getSettings();
 

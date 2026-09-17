@@ -4,6 +4,9 @@ import AddOptionForm from "@/components/admin/AddOptionForm";
 import { getProducts, getVariantGroups } from "@/lib/data";
 import { deleteGroup, removeOption } from "./actions";
 
+// See src/app/page.tsx for why every page reading data/*.json needs this.
+export const dynamic = "force-dynamic";
+
 export default async function AdminVariantesPage() {
   const [groups, products] = await Promise.all([getVariantGroups(), getProducts()]);
 
