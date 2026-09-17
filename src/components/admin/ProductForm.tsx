@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 import ProductVariantFields from "@/components/admin/ProductVariantFields";
 import PieceFormatFields from "@/components/admin/PieceFormatFields";
 import { upsertProduct, type ProductFormState } from "@/app/admin/productos/actions";
@@ -8,7 +8,6 @@ import {
   COOKING_METHODS,
   type PieceFormat,
   type ProductVariantSelection,
-  type Unit,
   type VariantGroup,
 } from "@/lib/types";
 
@@ -42,7 +41,6 @@ export default function ProductForm({
   product?: AdminProduct;
 }) {
   const [state, formAction, pending] = useActionState(upsertProduct, initialState);
-  const [unit, setUnit] = useState<Unit>((product?.unit as Unit) ?? "kg");
 
   return (
     <form action={formAction} className="grid gap-4 sm:grid-cols-2">
@@ -113,8 +111,7 @@ export default function ProductForm({
         </label>
         <select
           name="unit"
-          value={unit}
-          onChange={(e) => setUnit(e.target.value as Unit)}
+          defaultValue={product?.unit ?? "kg"}
           className="w-full rounded-lg border border-line px-3 py-2 text-sm"
         >
           <option value="kg">Por kg</option>
@@ -153,7 +150,6 @@ export default function ProductForm({
       </div>
 
       <PieceFormatFields
-        unit={unit}
         initialFormats={product?.pieceFormats}
         initialOfferLoose={product?.offerLoose}
       />

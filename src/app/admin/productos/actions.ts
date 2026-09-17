@@ -95,27 +95,20 @@ function parsePieceFormatFields(
       throw new Error(`El formato "${label}" necesita un peso aproximado mayor a 0.`);
     }
 
-    const priceRaw = String(formData.get(`pieceFormatPrice_${i}`) || "").trim();
-    let price: number | undefined;
-    if (priceRaw) {
-      price = Number(priceRaw);
-      if (!Number.isFinite(price) || price <= 0) {
-        throw new Error(`El precio del formato "${label}" tiene que ser mayor a 0.`);
-      }
-    } else if (unit === "unidad") {
-      // No per-kg rate to derive a price from when the product itself is
-      // priced flat "por unidad" — each format needs its own price.
-      throw new Error(
-        `El formato "${label}" necesita un precio (el producto es por unidad, no hay un precio/kg del que calcularlo).`
-      );
-    }
+    pieceFormats.push({ id: `pf-${i}-${slugify(label)}`, label, approxKg });
+  }
 
-    pieceFormats.push({ id: `pf-${i}-${slugify(label)}`, label, approxKg, price });
+  if (pieceFormats.length > 0 && unit !== "kg") {
+    // Always priced by real weight, whatever the format — a format's total
+    // is price (per kg) * approxKg, which only exists when unit === "kg".
+    throw new Error(
+      'Los formatos de venta (pieza entera, trozo, bolsa, etc.) necesitan que la unidad sea "Por kg" — se calculan a partir del precio por kilo, siempre se termina cobrando por peso real.'
+    );
   }
 
   if (!offerLoose && pieceFormats.length === 0) {
     throw new Error(
-      'Si desmarcás "Vender también sin formato fijo" tenés que cargar al menos un formato (ej: "Bolsa de 1kg").'
+      'Si desmarcás "Vender también suelto por kg" tenés que cargar al menos un formato (ej: "Bolsa de 1kg").'
     );
   }
 

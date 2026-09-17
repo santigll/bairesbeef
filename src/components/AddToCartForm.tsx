@@ -9,7 +9,7 @@ import type { Unit } from "@/lib/types";
 const STEP: Record<Unit, number> = { kg: 0.5, unidad: 1 };
 const MIN: Record<Unit, number> = { kg: 0.5, unidad: 1 };
 
-type Mode = { id: string; label: string; approxKg?: number; price?: number };
+type Mode = { id: string; label: string; approxKg?: number };
 
 export default function AddToCartForm({
   product,
@@ -20,12 +20,12 @@ export default function AddToCartForm({
 }) {
   const { addItem } = useCart();
 
-  const pieceFormats = product.pieceFormats ?? [];
+  const pieceFormats = product.unit === "kg" ? product.pieceFormats ?? [] : [];
   const baseModeLabel = product.unit === "kg" ? "Por kg" : "Unidad";
   const showBaseMode = product.offerLoose !== false || pieceFormats.length === 0;
   const modes: Mode[] = [
     ...(showBaseMode ? [{ id: "base", label: baseModeLabel }] : []),
-    ...pieceFormats.map((f) => ({ id: f.id, label: f.label, approxKg: f.approxKg, price: f.price })),
+    ...pieceFormats.map((f) => ({ id: f.id, label: f.label, approxKg: f.approxKg })),
   ];
   const hasModeChoice = modes.length > 1;
 
@@ -48,7 +48,7 @@ export default function AddToCartForm({
   const min = isLooseKg ? MIN[product.unit] : 1;
 
   const effectivePrice = isFixedFormat
-    ? (selectedMode?.price ?? Math.round(product.price * (selectedMode?.approxKg ?? 0)))
+    ? Math.round(product.price * (selectedMode?.approxKg ?? 0))
     : product.price;
 
   // Weight represented by ONE of whatever is currently selected, used to
@@ -154,13 +154,10 @@ export default function AddToCartForm({
         </div>
       )}
 
-      {isFixedFormat && selectedMode && (
+      {isFixedFormat && selectedMode?.approxKg && (
         <p className="text-xs text-ink/50">
-          {product.unit === "kg" && selectedMode.price == null && selectedMode.approxKg
-            ? `${formatPrice(product.price)}/kg × ≈${selectedMode.approxKg}kg ≈ ${formatPrice(effectivePrice)} por ${selectedMode.label.toLowerCase()}`
-            : `${formatPrice(effectivePrice)} por ${selectedMode.label.toLowerCase()}${
-                selectedMode.approxKg ? ` (≈${selectedMode.approxKg}kg)` : ""
-              }`}
+          {formatPrice(product.price)}/kg × ≈{selectedMode.approxKg}kg ≈{" "}
+          {formatPrice(effectivePrice)} por {selectedMode.label.toLowerCase()}
         </p>
       )}
 

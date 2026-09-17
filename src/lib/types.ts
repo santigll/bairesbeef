@@ -39,24 +39,24 @@ export type Product = {
   // with an optional note per option (e.g. approx. kg per tira, which
   // depends on the product).
   variantSelections?: ProductVariantSelection[];
-  // Fixed-weight ways to buy this product other than the base purchase
-  // (loose by kg, or one flat-priced unidad) — e.g. "Pieza entera" ~5kg,
-  // "Bolsa de 1kg", "Trozo de 1kg", "Churrasco" ~1kg. Works for either
-  // unit: when unit === "kg" a format's total defaults to price (per kg) *
-  // approxKg * quantity unless it sets its own `price`; when
-  // unit === "unidad" there's no per-kg rate to derive from, so each
-  // format must set its own `price`.
+  // Fixed-weight ways to buy this kg-priced product other than loose by kg
+  // — e.g. "Pieza entera" ~5kg, "Bolsa de 1kg", "Trozo de 1kg", "Churrasco"
+  // ~1kg. It's always sold by weight either way (the real charge is
+  // whatever it weighs, ±200/300g); these formats only change how it's
+  // portioned, so a format's total is always price (per kg) * approxKg *
+  // quantity. Only meaningful when unit === "kg" — a flat-priced "por
+  // unidad" product has no per-kg rate to calculate a format's price from.
   pieceFormats?: PieceFormat[];
-  // Whether the base purchase (loose por kg, or one flat-priced unidad) is
-  // offered at all, alongside any pieceFormats. Defaults to true when
-  // unset. Set to false (with at least one pieceFormat) for cuts that are
-  // only ever sold in fixed portions, e.g. osobuco en bolsas de 1kg.
+  // Whether buying loose "por kg" is offered at all, alongside any
+  // pieceFormats. Defaults to true when unset. Set to false (with at
+  // least one pieceFormat) for cuts that are only ever sold in fixed
+  // portions, e.g. osobuco en bolsas de 1kg.
   offerLoose?: boolean;
   // Approximate weight of "one" of this product, in kg. Only meaningful
-  // when unit === "unidad": purely informational/display (shown as "~X kg"
-  // next to the price, and used to show the running weight as the
-  // quantity goes up), never affects the price since the unidad already
-  // has its own flat price.
+  // when unit === "unidad" (e.g. combos, pollo entero por unidad): purely
+  // informational/display (shown as "~X kg" next to the price, and used
+  // to show the running weight as the quantity goes up), never affects
+  // the price since the unidad already has its own flat price.
   approxWeightKg?: number;
 };
 
@@ -64,11 +64,6 @@ export type PieceFormat = {
   id: string;
   label: string;
   approxKg: number;
-  // Optional fixed price for this format. When unit === "kg" and this is
-  // unset, the price is derived as product.price (per kg) * approxKg.
-  // When unit === "unidad" there's no per-kg rate to derive from, so this
-  // is required.
-  price?: number;
 };
 
 export type ProductVariantSelection = {

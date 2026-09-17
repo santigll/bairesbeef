@@ -445,7 +445,11 @@
       "Plancha",
       "Parrilla"
     ],
-    "variantSelections": []
+    "variantSelections": [],
+    "pieceFormats": [
+      { "id": "pieza-entera", "label": "Pieza entera", "approxKg": 2.2 },
+      { "id": "churrasquitos", "label": "Churrasquitos", "approxKg": 1 }
+    ]
   },
   {
     "id": "p-colita-cuadril",

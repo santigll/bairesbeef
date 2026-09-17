@@ -2,23 +2,20 @@
 
 import { useState } from "react";
 import { MAX_PIECE_FORMATS } from "@/lib/product-helpers";
-import type { PieceFormat, Unit } from "@/lib/types";
+import type { PieceFormat } from "@/lib/types";
 
 type FormatState = {
   key: number;
   label: string;
   approxKg: string;
-  price: string;
 };
 
 let nextKey = 0;
 
 export default function PieceFormatFields({
-  unit,
   initialFormats,
   initialOfferLoose,
 }: {
-  unit: Unit;
   initialFormats?: PieceFormat[];
   initialOfferLoose?: boolean;
 }) {
@@ -28,12 +25,11 @@ export default function PieceFormatFields({
       key: nextKey++,
       label: f.label,
       approxKg: String(f.approxKg),
-      price: f.price != null ? String(f.price) : "",
     }))
   );
 
   function addFormat() {
-    setFormats((prev) => [...prev, { key: nextKey++, label: "", approxKg: "", price: "" }]);
+    setFormats((prev) => [...prev, { key: nextKey++, label: "", approxKg: "" }]);
   }
 
   function removeFormat(key: number) {
@@ -44,18 +40,21 @@ export default function PieceFormatFields({
     setFormats((prev) => prev.map((f) => (f.key === key ? { ...f, ...patch } : f)));
   }
 
-  const baseModeLabel = unit === "kg" ? "por kg" : "la unidad completa";
-
   return (
     <div className="space-y-3 rounded-lg border border-line p-4 sm:col-span-2">
       <div>
-        <p className="text-sm font-medium text-ink/70">Formatos de venta</p>
+        <p className="text-sm font-medium text-ink/70">
+          Formatos de venta{" "}
+          <span className="font-normal text-ink/40">(solo aplica si la unidad es «Por kg»)</span>
+        </p>
         <p className="mt-1 text-xs text-ink/50">
-          Además de vender {baseModeLabel}, podés ofrecer formas fijas de
-          llevarlo (pieza entera, bolsa de 1kg, trozo, churrasco, etc.).
-          {unit === "kg"
-            ? " Si no le cargás precio a un formato, se calcula solo: precio/kg × peso aprox. × cantidad."
-            : " Como el producto es por unidad (no tiene precio por kg), cada formato necesita su propio precio."}
+          Siempre se cobra por el peso real (con su variación normal de
+          ±200/300g) — estos formatos solo cambian cómo se lo llevan
+          (pieza entera, bolsa de 1kg, trozo, churrasco, etc.), no cómo se
+          calcula el precio: precio/kg × peso aprox. × cantidad. Por
+          ejemplo, un corte que se suele comprar entero (como el lomo)
+          sigue siendo &quot;por kg&quot; — solo agregale un formato
+          &quot;Pieza entera&quot; con su peso aproximado.
         </p>
       </div>
 
@@ -66,7 +65,7 @@ export default function PieceFormatFields({
           checked={offerLoose}
           onChange={(e) => setOfferLoose(e.target.checked)}
         />
-        Vender también {baseModeLabel} (sin formato fijo)
+        Vender también suelto por kg
       </label>
       {!offerLoose && (
         <p className="text-xs text-accent">
@@ -85,7 +84,7 @@ export default function PieceFormatFields({
               value={f.label}
               onChange={(e) => updateFormat(f.key, { label: e.target.value })}
               placeholder='Ej: "Pieza entera", "Bolsa de 1kg", "Trozo de 1kg", "Churrasco"'
-              className="min-w-[180px] flex-1 rounded-lg border border-line px-3 py-1.5 text-sm"
+              className="min-w-[200px] flex-1 rounded-lg border border-line px-3 py-1.5 text-sm"
             />
             <input
               type="number"
@@ -95,17 +94,7 @@ export default function PieceFormatFields({
               min={0}
               step={0.01}
               placeholder="Peso aprox. (kg)"
-              className="w-32 rounded-lg border border-line px-3 py-1.5 text-sm"
-            />
-            <input
-              type="number"
-              name={`pieceFormatPrice_${i}`}
-              value={f.price}
-              onChange={(e) => updateFormat(f.key, { price: e.target.value })}
-              min={0}
-              step={1}
-              placeholder={unit === "kg" ? "Precio (opcional)" : "Precio (obligatorio)"}
-              className="w-40 rounded-lg border border-line px-3 py-1.5 text-sm"
+              className="w-36 rounded-lg border border-line px-3 py-1.5 text-sm"
             />
             <button
               type="button"
