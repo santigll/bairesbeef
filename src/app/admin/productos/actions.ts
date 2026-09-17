@@ -9,11 +9,17 @@ import {
   saveProducts,
   slugify,
 } from "@/lib/data";
-import { MAX_VARIANT_SLOTS, resolveProductCode, uniqueSlug } from "@/lib/product-helpers";
+import {
+  MAX_PIECE_FORMATS,
+  MAX_VARIANT_SLOTS,
+  resolveProductCode,
+  uniqueSlug,
+} from "@/lib/product-helpers";
 import { saveUploadedImage } from "@/lib/uploads";
 import {
   COOKING_METHODS,
   type CookingMethod,
+  type PieceFormat,
   type Product,
   type ProductVariantSelection,
   type Unit,
@@ -69,6 +75,35 @@ async function parseVariantFields(
   return { variantSelections: selections };
 }
 
+function parsePieceFormatFields(formData: FormData): {
+  pieceFormats: PieceFormat[];
+  offerLoose: boolean;
+} {
+  const offerLoose = formData.get("offerLoose") === "on";
+  const pieceFormats: PieceFormat[] = [];
+
+  for (let i = 0; i < MAX_PIECE_FORMATS; i++) {
+    const label = String(formData.get(`pieceFormatLabel_${i}`) || "").trim();
+    if (!label) continue;
+
+    const kgRaw = String(formData.get(`pieceFormatKg_${i}`) || "").trim();
+    const approxKg = Number(kgRaw);
+    if (!kgRaw || !Number.isFinite(approxKg) || approxKg <= 0) {
+      throw new Error(`El formato "${label}" necesita un peso aproximado mayor a 0.`);
+    }
+
+    pieceFormats.push({ id: `pf-${i}-${slugify(label)}`, label, approxKg });
+  }
+
+  if (!offerLoose && pieceFormats.length === 0) {
+    throw new Error(
+      'Si desmarcás "Vender también suelto por kg" tenés que cargar al menos un formato (ej: "Bolsa de 1kg").'
+    );
+  }
+
+  return { pieceFormats, offerLoose };
+}
+
 export async function upsertProduct(formData: FormData) {
   const id = String(formData.get("id") || "");
   const code = String(formData.get("code") || "").trim().toUpperCase();
@@ -98,6 +133,7 @@ export async function upsertProduct(formData: FormData) {
   const uploadedUrl = await saveUploadedImage(imageFile);
   const variantFields = await parseVariantFields(formData);
   const cookingMethods = parseCookingMethodsField(formData);
+  const { pieceFormats, offerLoose } = parsePieceFormatFields(formData);
 
   if (id) {
     const index = products.findIndex((p) => p.id === id);
@@ -115,6 +151,8 @@ export async function upsertProduct(formData: FormData) {
       featured,
       cookingMethods,
       approxWeightKg,
+      pieceFormats,
+      offerLoose,
       imageUrl: uploadedUrl ?? (removeImage ? "" : existing.imageUrl),
       ...variantFields,
     };
@@ -137,6 +175,8 @@ export async function upsertProduct(formData: FormData) {
       featured,
       cookingMethods,
       approxWeightKg,
+      pieceFormats,
+      offerLoose,
       order: maxOrder + 1,
       ...variantFields,
     };

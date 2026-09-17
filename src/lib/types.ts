@@ -39,14 +39,26 @@ export type Product = {
   // with an optional note per option (e.g. approx. kg per tira, which
   // depends on the product).
   variantSelections?: ProductVariantSelection[];
-  // Approximate weight of "one" of this product, in kg.
-  // - unit === "kg": when set, the storefront additionally offers buying
-  //   "la pieza entera" — customers pick a number of whole pieces instead
-  //   of a kg amount, and the total is calculated as
-  //   price (per kg) * approxWeightKg * pieces.
-  // - unit === "unidad": purely informational (shown as "~X kg" next to
-  //   the price) since the unit already has its own flat price.
+  // Fixed-weight ways to buy a kg-priced product other than loose by kg
+  // (e.g. "Pieza entera" ~5kg, "Bolsa de 1kg", "Trozo de 1kg", "Churrasco"
+  // ~1kg). Each format's total is calculated as price (per kg) * approxKg
+  // * quantity. Only meaningful when unit === "kg"; irrelevant otherwise.
+  pieceFormats?: PieceFormat[];
+  // Whether buying loose "por kg" is offered at all. Defaults to true when
+  // unset. Set to false (with at least one pieceFormat) for cuts that are
+  // only ever sold in fixed portions, e.g. osobuco en bolsas de 1kg.
+  offerLoose?: boolean;
+  // Approximate weight of "one" of this product, in kg. Only meaningful
+  // when unit === "unidad" (e.g. combos, pollo entero por unidad): purely
+  // informational, shown as "~X kg" next to the price, since the unit
+  // already has its own flat price.
   approxWeightKg?: number;
+};
+
+export type PieceFormat = {
+  id: string;
+  label: string;
+  approxKg: number;
 };
 
 export type ProductVariantSelection = {

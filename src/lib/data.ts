@@ -96,10 +96,23 @@ function normalizeProduct(p: LegacyProduct): Product {
         ]
       : []);
 
+  // Legacy: a single approxWeightKg on a kg-priced product used to enable
+  // one "pieza entera" whole-piece option. Migrate it into pieceFormats,
+  // the more general system that also covers fixed bolsas/trozos/etc.
+  let pieceFormats = p.pieceFormats;
+  let approxWeightKg = p.approxWeightKg;
+  if (!pieceFormats && p.unit === "kg" && p.approxWeightKg) {
+    pieceFormats = [{ id: "pieza-entera", label: "Pieza entera", approxKg: p.approxWeightKg }];
+    approxWeightKg = undefined;
+  }
+
   return {
     ...p,
     cookingMethods: p.cookingMethods ?? [],
     variantSelections,
+    pieceFormats,
+    offerLoose: p.offerLoose ?? true,
+    approxWeightKg,
   };
 }
 

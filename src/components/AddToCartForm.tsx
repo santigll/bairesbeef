@@ -9,6 +9,8 @@ import type { Unit } from "@/lib/types";
 const STEP: Record<Unit, number> = { kg: 0.5, unidad: 1 };
 const MIN: Record<Unit, number> = { kg: 0.5, unidad: 1 };
 
+type Mode = { id: string; label: string; approxKg?: number };
+
 export default function AddToCartForm({
   product,
   compact = false,
@@ -18,8 +20,18 @@ export default function AddToCartForm({
 }) {
   const { addItem } = useCart();
 
-  const offersWholePiece = product.unit === "kg" && !!product.approxWeightKg;
-  const [pieceMode, setPieceMode] = useState(false);
+  const pieceFormats = product.unit === "kg" ? product.pieceFormats ?? [] : [];
+  const showLoose = product.unit === "kg" && (product.offerLoose !== false || pieceFormats.length === 0);
+  const modes: Mode[] = [
+    ...(showLoose ? [{ id: "loose", label: "Por kg" }] : []),
+    ...pieceFormats.map((f) => ({ id: f.id, label: f.label, approxKg: f.approxKg })),
+  ];
+  const hasModeChoice = modes.length > 1;
+
+  const [modeId, setModeId] = useState(modes[0]?.id ?? "loose");
+  const selectedMode = modes.find((m) => m.id === modeId) ?? modes[0];
+  const isFixedFormat = !!selectedMode && selectedMode.id !== "loose";
+
   const [selections, setSelections] = useState<Record<string, string>>(() =>
     Object.fromEntries(
       product.variantSlots
@@ -27,28 +39,22 @@ export default function AddToCartForm({
         .map((slot) => [slot.groupId, slot.options[0].key])
     )
   );
-  const [qty, setQty] = useState(MIN[product.unit]);
+  const [qty, setQty] = useState(isFixedFormat ? 1 : MIN[product.unit]);
   const [added, setAdded] = useState(false);
 
-  const step = pieceMode ? 1 : STEP[product.unit];
-  const min = pieceMode ? 1 : MIN[product.unit];
-  const unitLabel = pieceMode
-    ? qty === 1
-      ? "pieza"
-      : "piezas"
-    : product.unit === "kg"
-      ? "kg"
-      : "u.";
+  const step = isFixedFormat ? 1 : STEP[product.unit];
+  const min = isFixedFormat ? 1 : MIN[product.unit];
+  const unitLabel = isFixedFormat ? "u." : product.unit === "kg" ? "kg" : "u.";
 
-  const piecePrice =
-    offersWholePiece && product.approxWeightKg
-      ? Math.round(product.price * product.approxWeightKg)
-      : 0;
-  const effectivePrice = pieceMode ? piecePrice : product.price;
+  const effectivePrice =
+    isFixedFormat && selectedMode?.approxKg
+      ? Math.round(product.price * selectedMode.approxKg)
+      : product.price;
 
-  function togglePieceMode(next: boolean) {
-    setPieceMode(next);
-    setQty(next ? 1 : MIN[product.unit]);
+  function changeMode(next: string) {
+    setModeId(next);
+    const nextIsFixed = modes.find((m) => m.id === next)?.id !== "loose";
+    setQty(nextIsFixed ? 1 : MIN[product.unit]);
   }
 
   function handleAdd() {
@@ -78,8 +84,9 @@ export default function AddToCartForm({
         price: effectivePrice,
         variantKey,
         variantLabel,
-        pieceMode: pieceMode || undefined,
-        pieceApproxKg: pieceMode ? product.approxWeightKg : undefined,
+        formatId: isFixedFormat ? selectedMode!.id : undefined,
+        formatLabel: isFixedFormat ? selectedMode!.label : undefined,
+        formatApproxKg: isFixedFormat ? selectedMode!.approxKg : undefined,
       },
       qty
     );
@@ -111,37 +118,31 @@ export default function AddToCartForm({
         </div>
       ))}
 
-      {offersWholePiece && (
+      {hasModeChoice && (
         <div>
           <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/50">
             Cómo lo llevás
           </label>
-          <div className="flex rounded-lg border border-line p-0.5">
-            <button
-              type="button"
-              onClick={() => togglePieceMode(false)}
-              className={`flex-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
-                !pieceMode ? "bg-ink text-paper" : "text-ink/60 hover:text-ink"
-              }`}
-            >
-              Por kg
-            </button>
-            <button
-              type="button"
-              onClick={() => togglePieceMode(true)}
-              className={`flex-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
-                pieceMode ? "bg-ink text-paper" : "text-ink/60 hover:text-ink"
-              }`}
-            >
-              Pieza entera (≈{product.approxWeightKg}kg)
-            </button>
-          </div>
-          {pieceMode && (
-            <p className="mt-1 text-xs text-ink/50">
-              {formatPrice(piecePrice)} aprox. por pieza
-            </p>
-          )}
+          <select
+            value={modeId}
+            onChange={(e) => changeMode(e.target.value)}
+            className="w-full rounded-lg border border-line bg-white px-3 py-2 text-sm"
+          >
+            {modes.map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.label}
+                {m.approxKg ? ` (≈${m.approxKg}kg)` : ""}
+              </option>
+            ))}
+          </select>
         </div>
+      )}
+
+      {isFixedFormat && selectedMode?.approxKg && (
+        <p className="text-xs text-ink/50">
+          {formatPrice(product.price)}/kg × ≈{selectedMode.approxKg}kg ≈{" "}
+          {formatPrice(effectivePrice)} por {selectedMode.label.toLowerCase()}
+        </p>
       )}
 
       <div className="flex items-center gap-2">
@@ -176,6 +177,12 @@ export default function AddToCartForm({
           {added ? "Agregado ✓" : "Agregar"}
         </button>
       </div>
+
+      {isFixedFormat && (
+        <p className="text-right text-sm font-semibold text-ink">
+          Total: {formatPrice(effectivePrice * qty)}
+        </p>
+      )}
     </div>
   );
 }

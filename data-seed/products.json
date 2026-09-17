@@ -88,7 +88,9 @@
       "Horno"
     ],
     "variantSelections": [],
-    "approxWeightKg": 1.8
+    "pieceFormats": [
+      { "id": "pieza-entera", "label": "Pieza entera", "approxKg": 1.8 }
+    ]
   },
   {
     "id": "p-chorizo",
@@ -182,7 +184,9 @@
         "optionNotes": {}
       }
     ],
-    "approxWeightKg": 2.5
+    "pieceFormats": [
+      { "id": "pieza-entera", "label": "Pieza entera", "approxKg": 2.5 }
+    ]
   },
   {
     "id": "p-bondiola",
@@ -387,7 +391,9 @@
       "Horno"
     ],
     "variantSelections": [],
-    "approxWeightKg": 1.3
+    "pieceFormats": [
+      { "id": "pieza-entera", "label": "Pieza entera", "approxKg": 1.3 }
+    ]
   },
   {
     "id": "p-bife-chorizo",
@@ -415,6 +421,11 @@
         ],
         "optionNotes": {}
       }
+    ],
+    "pieceFormats": [
+      { "id": "pieza-entera", "label": "Pieza entera", "approxKg": 5 },
+      { "id": "trozo-1kg", "label": "Trozo de 1kg", "approxKg": 1 },
+      { "id": "churrasco", "label": "Churrasco", "approxKg": 1 }
     ]
   },
   {
@@ -452,7 +463,10 @@
     "cookingMethods": [
       "Parrilla"
     ],
-    "variantSelections": []
+    "variantSelections": [],
+    "pieceFormats": [
+      { "id": "pieza-entera", "label": "Pieza entera", "approxKg": 1.1 }
+    ]
   },
   {
     "id": "p-carne-picada",
@@ -481,6 +495,28 @@
         ],
         "optionNotes": {}
       }
+    ]
+  },
+  {
+    "id": "p-osobuco",
+    "slug": "osobuco",
+    "code": "VAC-009",
+    "name": "Osobuco",
+    "categoryId": "cat-vacuna",
+    "unit": "kg",
+    "price": 10400,
+    "description": "Corte ideal para guisos y cocción lenta, con hueso y caracú.",
+    "imageUrl": "",
+    "active": true,
+    "featured": false,
+    "order": 9,
+    "cookingMethods": [
+      "Cacerola"
+    ],
+    "variantSelections": [],
+    "offerLoose": false,
+    "pieceFormats": [
+      { "id": "bolsa-1kg", "label": "Bolsa de 1kg", "approxKg": 1 }
     ]
   }
 ]

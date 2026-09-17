@@ -1,10 +1,16 @@
 import Image from "next/image";
 import AdminShell from "@/components/admin/AdminShell";
 import ProductVariantFields from "@/components/admin/ProductVariantFields";
+import PieceFormatFields from "@/components/admin/PieceFormatFields";
 import ImportProductsForm from "@/components/admin/ImportProductsForm";
 import { getCategories, getProducts, getVariantGroups } from "@/lib/data";
 import { formatPrice } from "@/lib/whatsapp";
-import { COOKING_METHODS, type ProductVariantSelection, type VariantGroup } from "@/lib/types";
+import {
+  COOKING_METHODS,
+  type PieceFormat,
+  type ProductVariantSelection,
+  type VariantGroup,
+} from "@/lib/types";
 import { deleteProduct, moveProduct, upsertProduct } from "./actions";
 
 export default async function AdminProductosPage() {
@@ -43,8 +49,9 @@ export default async function AdminProductosPage() {
             (útil para subir tu planilla maestra entera de una). El CSV
             también admite una columna opcional{" "}
             <span className="font-mono">peso_aprox_kg</span> para el peso
-            aproximado. Las fotos y las variantes no se manejan por CSV, esas
-            se cargan a mano en cada producto.
+            aproximado. Las fotos, las variantes y los formatos de venta
+            (pieza entera, bolsas, trozos) no se manejan por CSV, esos se
+            cargan a mano en cada producto.
           </p>
           <div className="mt-4 flex flex-wrap items-center gap-4">
             <a
@@ -142,6 +149,8 @@ type AdminProduct = {
   cookingMethods: string[];
   variantSelections?: ProductVariantSelection[];
   approxWeightKg?: number;
+  pieceFormats?: PieceFormat[];
+  offerLoose?: boolean;
 };
 
 function ProductRow({
@@ -350,9 +359,17 @@ function ProductForm({
         )}
       </div>
 
+      <PieceFormatFields
+        initialFormats={product?.pieceFormats}
+        initialOfferLoose={product?.offerLoose}
+      />
+
       <div>
         <label className="mb-1 block text-sm font-medium text-ink/70">
-          Peso aprox. (kg)
+          Peso aprox. (kg){" "}
+          <span className="font-normal text-ink/40">
+            (solo aplica si la unidad es «Por unidad»)
+          </span>
         </label>
         <input
           name="approxWeightKg"
@@ -360,15 +377,12 @@ function ProductForm({
           min={0}
           step={0.01}
           defaultValue={product?.approxWeightKg}
-          placeholder="Ej: 1.3"
+          placeholder="Ej: 1.8"
           className="w-full rounded-lg border border-line px-3 py-2 text-sm"
         />
         <p className="mt-1 text-xs text-ink/50">
-          Si el producto se vende <span className="font-medium">por kg</span>,
-          cargar esto habilita la opción de comprar &quot;la pieza
-          entera&quot; en la tienda (calcula el total automáticamente). Si se
-          vende <span className="font-medium">por unidad</span>, es solo
-          informativo y se muestra como &quot;≈X kg&quot;.
+          Es solo informativo: se muestra como &quot;≈X kg&quot; al lado del
+          precio, sin afectar el cálculo (la unidad ya tiene precio fijo).
         </p>
       </div>
 

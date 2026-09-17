@@ -4,6 +4,11 @@ import type { Product } from "./types";
 // at once (e.g. "Bifes de 4cm" AND "2 marcas" on the same cut).
 export const MAX_VARIANT_SLOTS = 3;
 
+// A kg-priced product can offer up to this many fixed-weight purchase
+// formats alongside (or instead of) buying loose by kg (e.g. "Pieza
+// entera", "Bolsa de 1kg", "Trozo de 1kg", "Churrasco").
+export const MAX_PIECE_FORMATS = 4;
+
 export function uniqueSlug(base: string, products: Product[], ignoreId?: string): string {
   const taken = new Set(products.filter((p) => p.id !== ignoreId).map((p) => p.slug));
   let slug = base || "producto";

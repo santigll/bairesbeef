@@ -19,21 +19,23 @@ export type CartItem = {
   qty: number;
   variantKey?: string;
   variantLabel?: string;
-  // "Pieza entera": qty counts whole pieces instead of kg, and price is
-  // already the calculated total for one piece (price per kg * approx
-  // kg per piece). pieceApproxKg is kept for display/WhatsApp wording.
-  pieceMode?: boolean;
-  pieceApproxKg?: number;
+  // Fixed-weight purchase format (e.g. "Pieza entera", "Bolsa de 1kg",
+  // "Trozo de 1kg") instead of buying loose by kg/unidad: qty counts
+  // formats instead of kg, and price is already the calculated total for
+  // one (price per kg * approxKg). formatId folds into the line's
+  // identity so the same product bought loose vs. in a fixed format are
+  // separate cart lines; label/approxKg are for display + WhatsApp wording.
+  formatId?: string;
+  formatLabel?: string;
+  formatApproxKg?: number;
 };
 
 export function makeLineId(
   productId: string,
   variantKey?: string,
-  pieceMode?: boolean
+  formatId?: string
 ): string {
-  return [productId, variantKey, pieceMode ? "pieza" : undefined]
-    .filter(Boolean)
-    .join("::");
+  return [productId, variantKey, formatId].filter(Boolean).join("::");
 }
 
 const STORAGE_KEY = "bb_cart_v2";
@@ -103,7 +105,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addItem = useCallback(
     (item: Omit<CartItem, "qty" | "lineId">, qty: number) => {
-      const lineId = makeLineId(item.productId, item.variantKey, item.pieceMode);
+      const lineId = makeLineId(item.productId, item.variantKey, item.formatId);
       setCart((prev) => {
         const existing = prev.find((i) => i.lineId === lineId);
         if (existing) {

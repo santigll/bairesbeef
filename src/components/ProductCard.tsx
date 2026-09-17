@@ -57,6 +57,25 @@ export default function ProductCard({ product }: { product: ProductWithVariants 
           </div>
         )}
 
+        {product.unit === "kg" && (product.pieceFormats?.length ?? 0) > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1">
+            {product.offerLoose === false ? (
+              <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
+                Se vende en {product.pieceFormats![0].label.toLowerCase()}
+              </span>
+            ) : (
+              product.pieceFormats!.map((f) => (
+                <span
+                  key={f.id}
+                  className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent"
+                >
+                  También en {f.label.toLowerCase()}
+                </span>
+              ))
+            )}
+          </div>
+        )}
+
         <div className="mt-2 flex items-baseline gap-1">
           <span className="text-lg font-bold text-accent">
             {formatPrice(product.price)}

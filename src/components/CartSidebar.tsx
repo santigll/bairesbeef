@@ -21,10 +21,8 @@ export default function CartSidebar({
       "",
       ...items.map((i) => {
         const variant = i.variantLabel ? ` (${i.variantLabel})` : "";
-        const qtyLabel = i.pieceMode
-          ? `${i.qty} pieza${i.qty === 1 ? "" : "s"} entera${i.qty === 1 ? "" : "s"}${
-              i.pieceApproxKg ? ` (≈${i.pieceApproxKg}kg c/u)` : ""
-            }`
+        const qtyLabel = i.formatLabel
+          ? `${i.qty} ${i.formatLabel}${i.formatApproxKg ? ` (≈${i.formatApproxKg}kg c/u)` : ""}`
           : `${i.qty} ${i.unit === "kg" ? "kg" : "u."}`;
         return `• ${i.name}${variant} — ${qtyLabel} (${formatPrice(i.price * i.qty)})`;
       }),
@@ -62,9 +60,9 @@ export default function CartSidebar({
                       <p className="text-xs text-ink/50">{item.variantLabel}</p>
                     )}
                     <p className="text-xs text-ink/40">
-                      {item.pieceMode
-                        ? `${formatPrice(item.price)} / pieza${
-                            item.pieceApproxKg ? ` (≈${item.pieceApproxKg}kg)` : ""
+                      {item.formatLabel
+                        ? `${formatPrice(item.price)} / ${item.formatLabel.toLowerCase()}${
+                            item.formatApproxKg ? ` (≈${item.formatApproxKg}kg)` : ""
                           }`
                         : `${formatPrice(item.price)} / ${item.unit}`}
                     </p>
@@ -81,8 +79,8 @@ export default function CartSidebar({
                 <div className="mt-2 flex items-center justify-between gap-2">
                   <input
                     type="number"
-                    min={item.pieceMode ? 1 : item.unit === "kg" ? 0.5 : 1}
-                    step={item.pieceMode ? 1 : item.unit === "kg" ? 0.5 : 1}
+                    min={item.formatLabel ? 1 : item.unit === "kg" ? 0.5 : 1}
+                    step={item.formatLabel ? 1 : item.unit === "kg" ? 0.5 : 1}
                     value={item.qty}
                     onChange={(e) => updateQty(item.lineId, Number(e.target.value))}
                     className="w-16 rounded-lg border border-line px-2 py-1 text-sm"
