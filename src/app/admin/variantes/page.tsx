@@ -1,6 +1,8 @@
 import AdminShell from "@/components/admin/AdminShell";
+import VariantGroupForm from "@/components/admin/VariantGroupForm";
+import AddOptionForm from "@/components/admin/AddOptionForm";
 import { getProducts, getVariantGroups } from "@/lib/data";
-import { addOption, deleteGroup, removeOption, upsertGroup } from "./actions";
+import { deleteGroup, removeOption } from "./actions";
 
 export default async function AdminVariantesPage() {
   const [groups, products] = await Promise.all([getVariantGroups(), getProducts()]);
@@ -25,21 +27,7 @@ export default async function AdminVariantesPage() {
           <h2 className="font-display text-xl tracking-wide text-ink">
             Nueva variante
           </h2>
-          <form action={upsertGroup} className="mt-4 flex flex-wrap gap-3">
-            <input
-              name="name"
-              type="text"
-              required
-              placeholder="Ej: Ahumado"
-              className="flex-1 min-w-[200px] rounded-lg border border-line px-3 py-2 text-sm"
-            />
-            <button
-              type="submit"
-              className="rounded-lg bg-ink px-5 py-2.5 text-sm font-semibold text-paper hover:bg-accent"
-            >
-              Agregar
-            </button>
-          </form>
+          <VariantGroupForm />
         </section>
 
         <section className="space-y-4">
@@ -48,21 +36,7 @@ export default async function AdminVariantesPage() {
             return (
               <div key={group.id} className="rounded-2xl border border-line bg-white p-5">
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <form action={upsertGroup} className="flex items-center gap-2">
-                    <input type="hidden" name="id" value={group.id} />
-                    <input
-                      name="name"
-                      type="text"
-                      defaultValue={group.name}
-                      className="rounded-lg border border-line px-3 py-1.5 text-sm font-medium"
-                    />
-                    <button
-                      type="submit"
-                      className="rounded-lg border border-line px-3 py-1.5 text-sm text-ink/70 hover:border-ink/40"
-                    >
-                      Guardar
-                    </button>
-                  </form>
+                  <VariantGroupForm group={group} compact />
 
                   {count === 0 ? (
                     <form action={deleteGroup}>
@@ -105,21 +79,7 @@ export default async function AdminVariantesPage() {
                   )}
                 </div>
 
-                <form action={addOption} className="mt-3 flex flex-wrap gap-2">
-                  <input type="hidden" name="groupId" value={group.id} />
-                  <input
-                    name="label"
-                    type="text"
-                    placeholder="Nueva opción, ej: Bifes de 3cm"
-                    className="flex-1 min-w-[180px] rounded-lg border border-line px-3 py-1.5 text-sm"
-                  />
-                  <button
-                    type="submit"
-                    className="rounded-lg border border-line px-3 py-1.5 text-sm text-ink/70 hover:border-ink/40"
-                  >
-                    + Opción
-                  </button>
-                </form>
+                <AddOptionForm groupId={group.id} />
               </div>
             );
           })}

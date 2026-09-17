@@ -16,24 +16,34 @@ function revalidatePublicPages() {
   revalidatePath("/tienda");
 }
 
-export async function upsertGroup(formData: FormData) {
-  const id = String(formData.get("id") || "");
-  const name = String(formData.get("name") || "").trim();
-  if (!name) throw new Error("El nombre es obligatorio.");
+export type VariantGroupFormState = { error?: string };
 
-  const groups = await getVariantGroups();
+export async function upsertGroup(
+  _prevState: VariantGroupFormState,
+  formData: FormData
+): Promise<VariantGroupFormState> {
+  try {
+    const id = String(formData.get("id") || "");
+    const name = String(formData.get("name") || "").trim();
+    if (!name) throw new Error("El nombre es obligatorio.");
 
-  if (id) {
-    const index = groups.findIndex((g) => g.id === id);
-    if (index === -1) throw new Error("Variante no encontrada.");
-    groups[index] = { ...groups[index], name };
-  } else {
-    const maxOrder = groups.reduce((max, g) => Math.max(max, g.order), 0);
-    groups.push({ id: generateId("vg"), name, order: maxOrder + 1, options: [] });
+    const groups = await getVariantGroups();
+
+    if (id) {
+      const index = groups.findIndex((g) => g.id === id);
+      if (index === -1) throw new Error("Variante no encontrada.");
+      groups[index] = { ...groups[index], name };
+    } else {
+      const maxOrder = groups.reduce((max, g) => Math.max(max, g.order), 0);
+      groups.push({ id: generateId("vg"), name, order: maxOrder + 1, options: [] });
+    }
+
+    await saveVariantGroups(groups);
+    revalidatePublicPages();
+    return {};
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Ocurrió un error inesperado." };
   }
-
-  await saveVariantGroups(groups);
-  revalidatePublicPages();
 }
 
 export async function deleteGroup(formData: FormData) {
@@ -51,27 +61,37 @@ export async function deleteGroup(formData: FormData) {
   revalidatePublicPages();
 }
 
-export async function addOption(formData: FormData) {
-  const groupId = String(formData.get("groupId") || "");
-  const label = String(formData.get("label") || "").trim();
-  if (!label) throw new Error("El nombre de la opción es obligatorio.");
+export type AddOptionFormState = { error?: string };
 
-  const groups = await getVariantGroups();
-  const group = groups.find((g) => g.id === groupId);
-  if (!group) throw new Error("Variante no encontrada.");
+export async function addOption(
+  _prevState: AddOptionFormState,
+  formData: FormData
+): Promise<AddOptionFormState> {
+  try {
+    const groupId = String(formData.get("groupId") || "");
+    const label = String(formData.get("label") || "").trim();
+    if (!label) throw new Error("El nombre de la opción es obligatorio.");
 
-  const base = slugify(label) || "opcion";
-  const taken = new Set(group.options.map((o) => o.key));
-  let key = base;
-  let i = 2;
-  while (taken.has(key)) {
-    key = `${base}-${i}`;
-    i += 1;
+    const groups = await getVariantGroups();
+    const group = groups.find((g) => g.id === groupId);
+    if (!group) throw new Error("Variante no encontrada.");
+
+    const base = slugify(label) || "opcion";
+    const taken = new Set(group.options.map((o) => o.key));
+    let key = base;
+    let i = 2;
+    while (taken.has(key)) {
+      key = `${base}-${i}`;
+      i += 1;
+    }
+
+    group.options.push({ key, label });
+    await saveVariantGroups(groups);
+    revalidatePublicPages();
+    return {};
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Ocurrió un error inesperado." };
   }
-
-  group.options.push({ key, label });
-  await saveVariantGroups(groups);
-  revalidatePublicPages();
 }
 
 export async function removeOption(formData: FormData) {

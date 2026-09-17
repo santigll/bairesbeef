@@ -1,6 +1,7 @@
 import AdminShell from "@/components/admin/AdminShell";
+import CategoryForm from "@/components/admin/CategoryForm";
 import { getCategories, getProducts } from "@/lib/data";
-import { deleteCategory, moveCategory, upsertCategory } from "./actions";
+import { deleteCategory, moveCategory } from "./actions";
 
 export default async function AdminCategoriasPage() {
   const [categories, products] = await Promise.all([
@@ -18,21 +19,7 @@ export default async function AdminCategoriasPage() {
           <h2 className="font-display text-2xl tracking-wide text-ink">
             Nueva categoría
           </h2>
-          <form action={upsertCategory} className="mt-4 flex flex-wrap gap-3">
-            <input
-              name="name"
-              type="text"
-              required
-              placeholder="Ej: Cordero"
-              className="flex-1 min-w-[200px] rounded-lg border border-line px-3 py-2 text-sm"
-            />
-            <button
-              type="submit"
-              className="rounded-lg bg-ink px-5 py-2.5 text-sm font-semibold text-paper hover:bg-accent"
-            >
-              Agregar
-            </button>
-          </form>
+          <CategoryForm />
         </section>
 
         <section>
@@ -72,21 +59,7 @@ export default async function AdminCategoriasPage() {
                         </button>
                       </form>
                     </div>
-                    <form action={upsertCategory} className="flex items-center gap-2">
-                      <input type="hidden" name="id" value={cat.id} />
-                      <input
-                        name="name"
-                        type="text"
-                        defaultValue={cat.name}
-                        className="rounded-lg border border-line px-3 py-1.5 text-sm"
-                      />
-                      <button
-                        type="submit"
-                        className="rounded-lg border border-line px-3 py-1.5 text-sm text-ink/70 hover:border-ink/40"
-                      >
-                        Guardar
-                      </button>
-                    </form>
+                    <CategoryForm category={cat} compact />
                     <span className="text-xs text-ink/50">
                       {count} producto{count === 1 ? "" : "s"}
                     </span>

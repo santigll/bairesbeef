@@ -11,48 +11,58 @@ function revalidatePublicPages() {
   revalidatePath("/tienda");
 }
 
-export async function upsertBanner(formData: FormData) {
-  const id = String(formData.get("id") || "");
-  const title = String(formData.get("title") || "").trim();
-  const subtitle = String(formData.get("subtitle") || "").trim();
-  const linkUrl = String(formData.get("linkUrl") || "/tienda").trim();
-  const active = formData.get("active") === "on";
-  const removeImage = formData.get("removeImage") === "on";
-  const imageFile = formData.get("image") as File | null;
+export type BannerFormState = { error?: string };
 
-  if (!title) throw new Error("El título es obligatorio.");
+export async function upsertBanner(
+  _prevState: BannerFormState,
+  formData: FormData
+): Promise<BannerFormState> {
+  try {
+    const id = String(formData.get("id") || "");
+    const title = String(formData.get("title") || "").trim();
+    const subtitle = String(formData.get("subtitle") || "").trim();
+    const linkUrl = String(formData.get("linkUrl") || "/tienda").trim();
+    const active = formData.get("active") === "on";
+    const removeImage = formData.get("removeImage") === "on";
+    const imageFile = formData.get("image") as File | null;
 
-  const banners = await getBanners();
-  const uploadedUrl = await saveUploadedImage(imageFile);
+    if (!title) throw new Error("El título es obligatorio.");
 
-  if (id) {
-    const index = banners.findIndex((b) => b.id === id);
-    if (index === -1) throw new Error("Banner no encontrado.");
-    const existing = banners[index];
-    banners[index] = {
-      ...existing,
-      title,
-      subtitle,
-      linkUrl,
-      active,
-      imageUrl: uploadedUrl ?? (removeImage ? "" : existing.imageUrl),
-    };
-  } else {
-    const maxOrder = banners.reduce((max, b) => Math.max(max, b.order), 0);
-    const newBanner: Banner = {
-      id: generateId("banner"),
-      title,
-      subtitle,
-      linkUrl,
-      active,
-      imageUrl: uploadedUrl ?? "",
-      order: maxOrder + 1,
-    };
-    banners.push(newBanner);
+    const banners = await getBanners();
+    const uploadedUrl = await saveUploadedImage(imageFile);
+
+    if (id) {
+      const index = banners.findIndex((b) => b.id === id);
+      if (index === -1) throw new Error("Banner no encontrado.");
+      const existing = banners[index];
+      banners[index] = {
+        ...existing,
+        title,
+        subtitle,
+        linkUrl,
+        active,
+        imageUrl: uploadedUrl ?? (removeImage ? "" : existing.imageUrl),
+      };
+    } else {
+      const maxOrder = banners.reduce((max, b) => Math.max(max, b.order), 0);
+      const newBanner: Banner = {
+        id: generateId("banner"),
+        title,
+        subtitle,
+        linkUrl,
+        active,
+        imageUrl: uploadedUrl ?? "",
+        order: maxOrder + 1,
+      };
+      banners.push(newBanner);
+    }
+
+    await saveBanners(banners);
+    revalidatePublicPages();
+    return {};
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Ocurrió un error inesperado." };
   }
-
-  await saveBanners(banners);
-  revalidatePublicPages();
 }
 
 export async function deleteBanner(formData: FormData) {

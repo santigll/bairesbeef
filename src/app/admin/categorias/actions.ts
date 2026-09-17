@@ -15,29 +15,39 @@ function revalidatePublicPages() {
   revalidatePath("/tienda");
 }
 
-export async function upsertCategory(formData: FormData) {
-  const id = String(formData.get("id") || "");
-  const name = String(formData.get("name") || "").trim();
-  if (!name) throw new Error("El nombre es obligatorio.");
+export type CategoryFormState = { error?: string };
 
-  const categories = await getCategories();
+export async function upsertCategory(
+  _prevState: CategoryFormState,
+  formData: FormData
+): Promise<CategoryFormState> {
+  try {
+    const id = String(formData.get("id") || "");
+    const name = String(formData.get("name") || "").trim();
+    if (!name) throw new Error("El nombre es obligatorio.");
 
-  if (id) {
-    const index = categories.findIndex((c) => c.id === id);
-    if (index === -1) throw new Error("Categoría no encontrada.");
-    categories[index] = { ...categories[index], name };
-  } else {
-    const maxOrder = categories.reduce((max, c) => Math.max(max, c.order), 0);
-    categories.push({
-      id: generateId("cat"),
-      slug: slugify(name),
-      name,
-      order: maxOrder + 1,
-    });
+    const categories = await getCategories();
+
+    if (id) {
+      const index = categories.findIndex((c) => c.id === id);
+      if (index === -1) throw new Error("Categoría no encontrada.");
+      categories[index] = { ...categories[index], name };
+    } else {
+      const maxOrder = categories.reduce((max, c) => Math.max(max, c.order), 0);
+      categories.push({
+        id: generateId("cat"),
+        slug: slugify(name),
+        name,
+        order: maxOrder + 1,
+      });
+    }
+
+    await saveCategories(categories);
+    revalidatePublicPages();
+    return {};
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Ocurrió un error inesperado." };
   }
-
-  await saveCategories(categories);
-  revalidatePublicPages();
 }
 
 export async function deleteCategory(formData: FormData) {

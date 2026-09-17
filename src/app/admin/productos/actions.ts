@@ -104,87 +104,97 @@ function parsePieceFormatFields(formData: FormData): {
   return { pieceFormats, offerLoose };
 }
 
-export async function upsertProduct(formData: FormData) {
-  const id = String(formData.get("id") || "");
-  const code = String(formData.get("code") || "").trim().toUpperCase();
-  const name = String(formData.get("name") || "").trim();
-  const categoryId = String(formData.get("categoryId") || "");
-  const unit = (String(formData.get("unit") || "kg") as Unit) === "unidad" ? "unidad" : "kg";
-  const price = Number(formData.get("price") || 0);
-  const description = String(formData.get("description") || "").trim();
-  const active = formData.get("active") === "on";
-  const featured = formData.get("featured") === "on";
-  const removeImage = formData.get("removeImage") === "on";
-  const imageFile = formData.get("image") as File | null;
-  const approxWeightKgRaw = String(formData.get("approxWeightKg") || "").trim();
-  const approxWeightKg = approxWeightKgRaw ? Number(approxWeightKgRaw) : undefined;
-  if (approxWeightKgRaw && (!Number.isFinite(approxWeightKg) || (approxWeightKg as number) <= 0)) {
-    throw new Error("El peso aproximado tiene que ser un número mayor a 0.");
+export type ProductFormState = { error?: string };
+
+export async function upsertProduct(
+  _prevState: ProductFormState,
+  formData: FormData
+): Promise<ProductFormState> {
+  try {
+    const id = String(formData.get("id") || "");
+    const code = String(formData.get("code") || "").trim().toUpperCase();
+    const name = String(formData.get("name") || "").trim();
+    const categoryId = String(formData.get("categoryId") || "");
+    const unit = (String(formData.get("unit") || "kg") as Unit) === "unidad" ? "unidad" : "kg";
+    const price = Number(formData.get("price") || 0);
+    const description = String(formData.get("description") || "").trim();
+    const active = formData.get("active") === "on";
+    const featured = formData.get("featured") === "on";
+    const removeImage = formData.get("removeImage") === "on";
+    const imageFile = formData.get("image") as File | null;
+    const approxWeightKgRaw = String(formData.get("approxWeightKg") || "").trim();
+    const approxWeightKg = approxWeightKgRaw ? Number(approxWeightKgRaw) : undefined;
+    if (approxWeightKgRaw && (!Number.isFinite(approxWeightKg) || (approxWeightKg as number) <= 0)) {
+      throw new Error("El peso aproximado tiene que ser un número mayor a 0.");
+    }
+
+    if (!name) throw new Error("El nombre es obligatorio.");
+
+    const categories = await getCategories();
+    if (!categories.some((c) => c.id === categoryId)) {
+      throw new Error("Elegí una categoría válida.");
+    }
+
+    const products = await getProducts();
+    const uploadedUrl = await saveUploadedImage(imageFile);
+    const variantFields = await parseVariantFields(formData);
+    const cookingMethods = parseCookingMethodsField(formData);
+    const { pieceFormats, offerLoose } = parsePieceFormatFields(formData);
+
+    if (id) {
+      const index = products.findIndex((p) => p.id === id);
+      if (index === -1) throw new Error("Producto no encontrado.");
+      const existing = products[index];
+      products[index] = {
+        ...existing,
+        code: resolveProductCode(code, products, id),
+        name,
+        categoryId,
+        unit,
+        price: Number.isFinite(price) ? price : existing.price,
+        description,
+        active,
+        featured,
+        cookingMethods,
+        approxWeightKg,
+        pieceFormats,
+        offerLoose,
+        imageUrl: uploadedUrl ?? (removeImage ? "" : existing.imageUrl),
+        ...variantFields,
+      };
+    } else {
+      const slug = uniqueSlug(slugify(name), products);
+      const maxOrder = products
+        .filter((p) => p.categoryId === categoryId)
+        .reduce((max, p) => Math.max(max, p.order), 0);
+      const newProduct: Product = {
+        id: generateId("p"),
+        slug,
+        code: resolveProductCode(code, products),
+        name,
+        categoryId,
+        unit,
+        price: Number.isFinite(price) ? price : 0,
+        description,
+        imageUrl: uploadedUrl ?? "",
+        active,
+        featured,
+        cookingMethods,
+        approxWeightKg,
+        pieceFormats,
+        offerLoose,
+        order: maxOrder + 1,
+        ...variantFields,
+      };
+      products.push(newProduct);
+    }
+
+    await saveProducts(products);
+    revalidatePublicPages();
+    return {};
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Ocurrió un error inesperado." };
   }
-
-  if (!name) throw new Error("El nombre es obligatorio.");
-
-  const categories = await getCategories();
-  if (!categories.some((c) => c.id === categoryId)) {
-    throw new Error("Elegí una categoría válida.");
-  }
-
-  const products = await getProducts();
-  const uploadedUrl = await saveUploadedImage(imageFile);
-  const variantFields = await parseVariantFields(formData);
-  const cookingMethods = parseCookingMethodsField(formData);
-  const { pieceFormats, offerLoose } = parsePieceFormatFields(formData);
-
-  if (id) {
-    const index = products.findIndex((p) => p.id === id);
-    if (index === -1) throw new Error("Producto no encontrado.");
-    const existing = products[index];
-    products[index] = {
-      ...existing,
-      code: resolveProductCode(code, products, id),
-      name,
-      categoryId,
-      unit,
-      price: Number.isFinite(price) ? price : existing.price,
-      description,
-      active,
-      featured,
-      cookingMethods,
-      approxWeightKg,
-      pieceFormats,
-      offerLoose,
-      imageUrl: uploadedUrl ?? (removeImage ? "" : existing.imageUrl),
-      ...variantFields,
-    };
-  } else {
-    const slug = uniqueSlug(slugify(name), products);
-    const maxOrder = products
-      .filter((p) => p.categoryId === categoryId)
-      .reduce((max, p) => Math.max(max, p.order), 0);
-    const newProduct: Product = {
-      id: generateId("p"),
-      slug,
-      code: resolveProductCode(code, products),
-      name,
-      categoryId,
-      unit,
-      price: Number.isFinite(price) ? price : 0,
-      description,
-      imageUrl: uploadedUrl ?? "",
-      active,
-      featured,
-      cookingMethods,
-      approxWeightKg,
-      pieceFormats,
-      offerLoose,
-      order: maxOrder + 1,
-      ...variantFields,
-    };
-    products.push(newProduct);
-  }
-
-  await saveProducts(products);
-  revalidatePublicPages();
 }
 
 export async function deleteProduct(formData: FormData) {
