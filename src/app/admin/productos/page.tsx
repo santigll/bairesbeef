@@ -43,8 +43,15 @@ export default async function AdminProductosPage() {
             crea uno nuevo. Si tildás{" "}
             <span className="font-medium">&quot;Reemplazar catálogo completo&quot;</span>,
             además se elimina cualquier producto que no esté en el archivo
-            (útil para subir tu planilla maestra entera de una). El CSV
-            también admite una columna opcional{" "}
+            (útil para subir tu planilla maestra entera de una). En una
+            actualización, una celda vacía de descripción, cocción, activo o
+            destacado <span className="font-medium">no borra</span> lo que ya
+            estaba cargado — se conserva tal cual, así se puede ir completando
+            la planilla de a poco. Para{" "}
+            <span className="font-medium">cocción</span>, escribí los métodos
+            separados por coma (ej: <span className="font-mono">Parrilla, Horno</span>
+            ), usando exactamente estas palabras: Parrilla, Horno, Plancha,
+            Cacerola, Milanesa. El CSV también admite una columna opcional{" "}
             <span className="font-mono">peso_aprox_kg</span> para el peso
             aproximado. Las fotos, las variantes y los formatos de venta
             (pieza entera, bolsas, trozos) no se manejan por CSV, esos se

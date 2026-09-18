@@ -115,11 +115,9 @@ export async function importProducts(
     }
     const categoryId = category.id;
 
-    const active = parseBool(pick(row, ["activo", "active"]), true);
-    const featured = parseBool(pick(row, ["destacado", "featured"]), false);
-    const cookingMethods = parseCookingMethods(
-      pick(row, ["coccion", "cocción", "cooking"])
-    );
+    const activoRaw = pick(row, ["activo", "active"]);
+    const destacadoRaw = pick(row, ["destacado", "featured"]);
+    const coccionRaw = pick(row, ["coccion", "cocción", "cooking"]);
     const pesoAproxRaw = pick(row, ["peso_aprox_kg", "peso aprox", "peso", "kg aprox"]).replace(
       ",",
       "."
@@ -132,6 +130,11 @@ export async function importProducts(
     const existingIndex = codigo ? products.findIndex((p) => p.code === codigo) : -1;
 
     if (existingIndex >= 0) {
+      // A master spreadsheet is often filled in gradually (e.g. prices are
+      // kept up to date long before every description or cocción cell is),
+      // so a blank cell here means "leave this field as it is" rather than
+      // "clear it" — only a cell that actually has something in it
+      // overwrites what's already saved.
       const existing = products[existingIndex];
       products[existingIndex] = {
         ...existing,
@@ -139,10 +142,10 @@ export async function importProducts(
         categoryId,
         unit,
         price: precio,
-        description: descripcion,
-        active,
-        featured,
-        cookingMethods,
+        description: descripcion || existing.description,
+        active: activoRaw ? parseBool(activoRaw, existing.active) : existing.active,
+        featured: destacadoRaw ? parseBool(destacadoRaw, existing.featured) : existing.featured,
+        cookingMethods: coccionRaw ? parseCookingMethods(coccionRaw) : existing.cookingMethods,
         approxWeightKg: approxWeightKg ?? existing.approxWeightKg,
       };
       touchedCodes.add(existing.code);
@@ -161,10 +164,10 @@ export async function importProducts(
         price: precio,
         description: descripcion,
         imageUrl: "",
-        active,
-        featured,
+        active: parseBool(activoRaw, true),
+        featured: parseBool(destacadoRaw, false),
         order,
-        cookingMethods,
+        cookingMethods: parseCookingMethods(coccionRaw),
         approxWeightKg,
       };
       products.push(newProduct);
