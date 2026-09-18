@@ -134,23 +134,30 @@ export default function AddToCartForm({
         </div>
       ))}
 
-      {hasModeChoice && (
+      {(hasModeChoice || isFixedFormat) && selectedMode && (
         <div>
           <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-ink/50">
             Cómo lo llevás
           </label>
-          <select
-            value={modeId}
-            onChange={(e) => changeMode(e.target.value)}
-            className="w-full rounded-lg border border-line bg-white px-3 py-2 text-sm"
-          >
-            {modes.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.label}
-                {m.approxKg ? ` (${m.approxKg}kg aprox)` : ""}
-              </option>
-            ))}
-          </select>
+          {hasModeChoice ? (
+            <select
+              value={modeId}
+              onChange={(e) => changeMode(e.target.value)}
+              className="w-full rounded-lg border border-line bg-white px-3 py-2 text-sm"
+            >
+              {modes.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.label}
+                  {m.approxKg ? ` (${m.approxKg}kg aprox)` : ""}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <p className="rounded-lg border border-line bg-paper-alt px-3 py-2 text-sm text-ink">
+              {selectedMode.label}
+              {selectedMode.approxKg ? ` (${selectedMode.approxKg}kg aprox)` : ""}
+            </p>
+          )}
         </div>
       )}
 
