@@ -82,7 +82,6 @@ function parsePieceFormatFields(
   pieceFormats: PieceFormat[];
   offerLoose: boolean;
 } {
-  const offerLoose = formData.get("offerLoose") === "on";
   const pieceFormats: PieceFormat[] = [];
 
   for (let i = 0; i < MAX_PIECE_FORMATS; i++) {
@@ -106,11 +105,10 @@ function parsePieceFormatFields(
     );
   }
 
-  if (!offerLoose && pieceFormats.length === 0) {
-    throw new Error(
-      'Si desmarcás "Vender también suelto por kg" tenés que cargar al menos un formato (ej: "Bolsa de 1kg").'
-    );
-  }
+  // With no fixed formats at all, "vender suelto por kg" is the only way
+  // to buy this product either way — the checkbox is moot, so a product
+  // never ends up accidentally unsellable no matter its default state.
+  const offerLoose = pieceFormats.length === 0 ? true : formData.get("offerLoose") === "on";
 
   return { pieceFormats, offerLoose };
 }

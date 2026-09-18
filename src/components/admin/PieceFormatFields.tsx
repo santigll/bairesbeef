@@ -19,7 +19,7 @@ export default function PieceFormatFields({
   initialFormats?: PieceFormat[];
   initialOfferLoose?: boolean;
 }) {
-  const [offerLoose, setOfferLoose] = useState(initialOfferLoose ?? true);
+  const [offerLoose, setOfferLoose] = useState(initialOfferLoose ?? false);
   const [formats, setFormats] = useState<FormatState[]>(() =>
     (initialFormats ?? []).map((f) => ({
       key: nextKey++,
@@ -67,11 +67,11 @@ export default function PieceFormatFields({
         />
         Vender también suelto por kg
       </label>
-      {!offerLoose && (
-        <p className="text-xs text-accent">
-          Si desmarcás esto, el producto solo se va a poder comprar en los
-          formatos fijos de abajo (ej: osobuco que solo sale en bolsas de
-          1kg). Cargá al menos uno.
+      {!offerLoose && formats.length > 0 && (
+        <p className="text-xs text-ink/50">
+          Sin esto tildado, el producto solo se va a poder comprar en los
+          formatos fijos de abajo (ej: osobuco, que solo sale en bolsas de
+          1kg).
         </p>
       )}
 
