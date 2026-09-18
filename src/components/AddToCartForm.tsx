@@ -147,7 +147,7 @@ export default function AddToCartForm({
             {modes.map((m) => (
               <option key={m.id} value={m.id}>
                 {m.label}
-                {m.approxKg ? ` (≈${m.approxKg}kg)` : ""}
+                {m.approxKg ? ` (${m.approxKg}kg aprox)` : ""}
               </option>
             ))}
           </select>
@@ -156,7 +156,7 @@ export default function AddToCartForm({
 
       {isFixedFormat && selectedMode?.approxKg && (
         <p className="text-xs text-ink/50">
-          {formatPrice(product.price)}/kg × ≈{selectedMode.approxKg}kg ≈{" "}
+          {formatPrice(product.price)}/kg × {selectedMode.approxKg}kg aprox ={" "}
           {formatPrice(effectivePrice)} por {selectedMode.label.toLowerCase()}
         </p>
       )}

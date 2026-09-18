@@ -22,7 +22,7 @@ export default function CartSidebar({
       ...items.map((i) => {
         const variant = i.variantLabel ? ` (${i.variantLabel})` : "";
         const qtyLabel = i.formatLabel
-          ? `${i.qty} ${i.formatLabel}${i.formatApproxKg ? ` (≈${i.formatApproxKg}kg c/u)` : ""}`
+          ? `${i.qty} ${i.formatLabel}${i.formatApproxKg ? ` (${i.formatApproxKg}kg aprox c/u)` : ""}`
           : `${i.qty} ${i.unit === "kg" ? "kg" : "u."}`;
         return `• ${i.name}${variant} — ${qtyLabel} (${formatPrice(i.price * i.qty)})`;
       }),
@@ -62,7 +62,7 @@ export default function CartSidebar({
                     <p className="text-xs text-ink/40">
                       {item.formatLabel
                         ? `${formatPrice(item.price)} / ${item.formatLabel.toLowerCase()}${
-                            item.formatApproxKg ? ` (≈${item.formatApproxKg}kg)` : ""
+                            item.formatApproxKg ? ` (${item.formatApproxKg}kg aprox)` : ""
                           }`
                         : `${formatPrice(item.price)} / ${item.unit}`}
                     </p>

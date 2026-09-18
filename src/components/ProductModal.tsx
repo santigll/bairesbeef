@@ -86,22 +86,16 @@ export default function ProductModal({
               </div>
             )}
 
-            {product.unit === "kg" && (product.pieceFormats?.length ?? 0) > 0 && (
+            {product.unit === "kg" && product.offerLoose !== false && (product.pieceFormats?.length ?? 0) > 0 && (
               <div className="mt-3 flex flex-wrap gap-1.5">
-                {product.offerLoose === false ? (
-                  <span className="rounded-full bg-accent/10 px-2.5 py-1 text-xs font-medium text-accent">
-                    Se vende en {product.pieceFormats![0].label.toLowerCase()}
+                {product.pieceFormats!.map((f) => (
+                  <span
+                    key={f.id}
+                    className="rounded-full bg-accent/10 px-2.5 py-1 text-xs font-medium text-accent"
+                  >
+                    También en {f.label.toLowerCase()}
                   </span>
-                ) : (
-                  product.pieceFormats!.map((f) => (
-                    <span
-                      key={f.id}
-                      className="rounded-full bg-accent/10 px-2.5 py-1 text-xs font-medium text-accent"
-                    >
-                      También en {f.label.toLowerCase()}
-                    </span>
-                  ))
-                )}
+                ))}
               </div>
             )}
 
@@ -112,7 +106,7 @@ export default function ProductModal({
               <span className="text-sm text-ink/50">/ {product.unit}</span>
               {product.unit === "unidad" && product.approxWeightKg && (
                 <span className="text-sm text-ink/40">
-                  (≈{product.approxWeightKg}kg)
+                  ({product.approxWeightKg}kg aprox)
                 </span>
               )}
             </div>

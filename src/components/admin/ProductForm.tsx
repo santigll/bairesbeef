@@ -171,8 +171,8 @@ export default function ProductForm({
           className="w-full rounded-lg border border-line px-3 py-2 text-sm"
         />
         <p className="mt-1 text-xs text-ink/50">
-          Es solo informativo: se muestra como &quot;≈X kg&quot; al lado del
-          precio, y en la tienda el contador de cantidad va sumando este
+          Es solo informativo: se muestra como &quot;X kg aprox&quot; al lado
+          del precio, y en la tienda el contador de cantidad va sumando este
           peso (ej: 2,2kg, 4,4kg...) en vez de mostrar &quot;1 u., 2 u.&quot;
           — sin afectar el cálculo, la unidad ya tiene precio fijo.
         </p>
