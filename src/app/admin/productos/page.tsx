@@ -4,6 +4,7 @@ import ProductForm, { type AdminProduct } from "@/components/admin/ProductForm";
 import ImportProductsForm from "@/components/admin/ImportProductsForm";
 import { getCategories, getProducts, getVariantGroups } from "@/lib/data";
 import { formatPrice } from "@/lib/whatsapp";
+import { MAX_PIECE_FORMATS } from "@/lib/product-helpers";
 import type { VariantGroup } from "@/lib/types";
 import { deleteProduct, moveProduct } from "./actions";
 
@@ -44,18 +45,33 @@ export default async function AdminProductosPage() {
             <span className="font-medium">&quot;Reemplazar catálogo completo&quot;</span>,
             además se elimina cualquier producto que no esté en el archivo
             (útil para subir tu planilla maestra entera de una). En una
-            actualización, una celda vacía de descripción, cocción, activo o
-            destacado <span className="font-medium">no borra</span> lo que ya
-            estaba cargado — se conserva tal cual, así se puede ir completando
-            la planilla de a poco. Para{" "}
+            actualización, una celda vacía de descripción, cocción, activo,
+            destacado o formatos{" "}
+            <span className="font-medium">no borra</span> lo que ya estaba
+            cargado — se conserva tal cual, así se puede ir completando la
+            planilla de a poco. Para{" "}
             <span className="font-medium">cocción</span>, escribí los métodos
             separados por coma (ej: <span className="font-mono">Parrilla, Horno</span>
             ), usando exactamente estas palabras: Parrilla, Horno, Plancha,
-            Cacerola, Milanesa. El CSV también admite una columna opcional{" "}
+            Cacerola, Milanesa. También admite una columna opcional{" "}
             <span className="font-mono">peso_aprox_kg</span> para el peso
-            aproximado. Las fotos, las variantes y los formatos de venta
-            (pieza entera, bolsas, trozos) no se manejan por CSV, esos se
-            cargan a mano en cada producto.
+            aproximado, y hasta {MAX_PIECE_FORMATS} formatos de venta con las
+            columnas <span className="font-mono">formato1</span> /{" "}
+            <span className="font-mono">formato1_kg</span>,{" "}
+            <span className="font-mono">formato2</span> /{" "}
+            <span className="font-mono">formato2_kg</span>, etc. (ej: para
+            &quot;Pieza entera&quot; de 2,1kg poné{" "}
+            <span className="font-mono">formato1=Pieza entera</span> y{" "}
+            <span className="font-mono">formato1_kg=2.1</span>) — solo
+            funcionan si la unidad es &quot;kg&quot;. Sumá{" "}
+            <span className="font-mono">vender_suelto=no</span> si además
+            querés que solo se pueda comprar en esos formatos, sin la opción
+            de kg suelto (como el osobuco). Completar cualquier columna de
+            formato en una fila{" "}
+            <span className="font-medium">reemplaza todos</span> los formatos
+            de ese producto, no los suma. Las fotos y las variantes
+            (picado, bifes, marcado, etc.) siguen sin manejarse por CSV, esas
+            se cargan a mano en cada producto.
           </p>
           <div className="mt-4 flex flex-wrap items-center gap-4">
             <a

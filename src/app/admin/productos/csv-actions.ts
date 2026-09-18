@@ -9,7 +9,13 @@ import {
   saveProducts,
   slugify,
 } from "@/lib/data";
-import { parseCookingMethods, parseCsvRows, pick } from "@/lib/csv";
+import {
+  parseBool,
+  parseCookingMethods,
+  parseCsvRows,
+  parsePieceFormatsFromRow,
+  pick,
+} from "@/lib/csv";
 import { generateCode, uniqueCode } from "@/lib/product-helpers";
 import type { Product, Unit } from "@/lib/types";
 
@@ -19,12 +25,6 @@ export type ImportResult = {
   deleted: number;
   errors: string[];
 };
-
-function parseBool(value: string, fallback: boolean): boolean {
-  const v = value.trim().toLowerCase();
-  if (!v) return fallback;
-  return ["si", "sí", "true", "1", "yes"].includes(v);
-}
 
 export async function importProducts(
   _prevState: ImportResult,
@@ -127,6 +127,36 @@ export async function importProducts(
         ? Number(pesoAproxRaw)
         : undefined;
 
+    // Formatos de venta (pieza entera, bolsa, trozo, etc.): a row that
+    // doesn't touch any formatoN/vender_suelto column leaves whatever the
+    // product already has alone, same as descripción/cocción above. A row
+    // that touches formatoN columns but ends up with nothing valid (typo
+    // in the weight, etc.) also leaves the saved formats alone — the error
+    // is reported, but nothing gets silently wiped over a mistake.
+    const parsedFormats = parsePieceFormatsFromRow(row);
+    for (const err of parsedFormats.errors) {
+      errors.push(`Fila ${line} (${nombre}): ${err}`);
+    }
+
+    let pieceFormats: typeof parsedFormats.pieceFormats | undefined;
+    let offerLoose: boolean | undefined;
+    if (parsedFormats.formatEntriesTouched && parsedFormats.pieceFormats.length > 0) {
+      if (unit !== "kg") {
+        errors.push(
+          `Fila ${line} (${nombre}): los formatos de venta necesitan que la unidad sea "kg", no se aplicaron.`
+        );
+      } else {
+        pieceFormats = parsedFormats.pieceFormats;
+        offerLoose = parsedFormats.venderSueltoRaw
+          ? parseBool(parsedFormats.venderSueltoRaw, false)
+          : false;
+      }
+    } else if (parsedFormats.venderSueltoRaw) {
+      // Only "vender_suelto" was touched — flip that flag without
+      // disturbing whatever formats are already saved.
+      offerLoose = parseBool(parsedFormats.venderSueltoRaw, true);
+    }
+
     const existingIndex = codigo ? products.findIndex((p) => p.code === codigo) : -1;
 
     if (existingIndex >= 0) {
@@ -147,6 +177,8 @@ export async function importProducts(
         featured: destacadoRaw ? parseBool(destacadoRaw, existing.featured) : existing.featured,
         cookingMethods: coccionRaw ? parseCookingMethods(coccionRaw) : existing.cookingMethods,
         approxWeightKg: approxWeightKg ?? existing.approxWeightKg,
+        pieceFormats: pieceFormats ?? existing.pieceFormats,
+        offerLoose: offerLoose ?? existing.offerLoose,
       };
       touchedCodes.add(existing.code);
       updated += 1;
@@ -169,6 +201,8 @@ export async function importProducts(
         order,
         cookingMethods: parseCookingMethods(coccionRaw),
         approxWeightKg,
+        pieceFormats,
+        offerLoose: offerLoose ?? true,
       };
       products.push(newProduct);
       touchedCodes.add(newProduct.code);
